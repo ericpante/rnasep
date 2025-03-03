@@ -5,6 +5,11 @@
 Testing for transcriptomic effects of Hg x pCO2 on Sepia officinalis embryos and juvéniles (head tissues).
 
 
+#######################################################
+## Reference genome assembly for Sepia officinalis 
+
+https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_964300435.1/
+
 
 #######################################################
 ## Bioinformatic Tools and versions for data processing
