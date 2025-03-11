@@ -17,4 +17,4 @@ ADAPTER=TruSeq3-PE-2.fa
 
 cd /shared/projects/rnasep/2-Trimming/rnasep1/fastp/
 
-fastp --thread 10 -i ${READ1} -o ${OUTPUT}_R1_pe.fastq.gz -I ${READ2} -O ${OUTPUT}_R2_pe.fastq.gz --qualified_quality_phred 30 --unqualified_percent_limit 10 --detect_adapter_for_pe --adapter_fasta ${ADAPTER} -g -x -f 13 -F 13 --length_required 120
+fastp --thread 15 -i ${READ1} -o ${OUTPUT}_R1_pe.fastq.gz -I ${READ2} -O ${OUTPUT}_R2_pe.fastq.gz --qualified_quality_phred 30 --unqualified_percent_limit 10 --detect_adapter_for_pe --adapter_fasta ${ADAPTER} -g -x --length_required 120
