@@ -1,0 +1,8 @@
+CT7	CT7.7_15	CT7.7_15_R1_pe.fastq.gz	CT7.7_15_R2_pe.fastq.gz
+CT8	CT8.1_3		CT8.1_3_R1_pe.fastq.gz	CT8.1_3_R2_pe.fastq.gz
+Ag7	Ag7.7_2		Ag7.7_2_R1_pe.fastq.gz	Ag7.7_2_R2_pe.fastq.gz
+Ag8	Ag8.1_2		Ag8.1_2_R1_pe.fastq.gz	Ag8.1_2_R2_pe.fastq.gz
+Hg7	Hg7.7_125	Hg7.7_125_R1_pe.fastq.gz	Hg7.7_125_R2_pe.fastq.gz
+Hg8	Hg8.1_36	Hg8.1_36_R1_pe.fastq.gz		Hg8.1_36_R2_pe.fastq.gz
+	
+
