@@ -4,7 +4,9 @@
 
 Testing for transcriptomic effects of Hg x pCO2 on Sepia officinalis embryos and juvéniles (head tissues).
 
-s
+
+![](Workflow.jpg)
+
 #######################################################
 ## Bioinformatic Tools and versions for data processing
 
