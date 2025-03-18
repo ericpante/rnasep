@@ -21,8 +21,9 @@ Trimmomatic_v0.39
 bowtie_v2.5.1	; samtools_v1.14	; Jellyfish_v2.3.0
 Salmon_v1.10.1	; Python_v3.11.1	; Trinity_v2.15.1
 
-### 3a. Assembly quality assessment:
+### 3a. Assembly quality assessment (https://github.com/trinityrnaseq/trinityrnaseq/wiki):
 
 -> ContigsN50: Trinity_v2.15.1
+
 -> E90N50: Kallisto_v0.46.2	; Trinity_v2.15.1
 
