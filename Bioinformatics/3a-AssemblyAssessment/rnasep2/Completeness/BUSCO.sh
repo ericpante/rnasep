@@ -4,8 +4,8 @@
 #SBATCH --cpus-per-task=20
 #SBATCH --mem-per-cpu=10G
 #SBATCH -t 20:00:00
-#SBATCH --error=Blastx_%j.err
-#SBATCH --output=Blastx_%j.out
+#SBATCH --error=busco_%j.err
+#SBATCH --output=busco_%j.out
 
 #Purge unused modules
 module purge
