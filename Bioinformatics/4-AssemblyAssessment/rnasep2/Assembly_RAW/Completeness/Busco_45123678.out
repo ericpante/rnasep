@@ -1,0 +1,61 @@
+2025-03-19 11:50:13 INFO:	***** Start a BUSCO v5.5.0 analysis, current time: 03/19/2025 11:50:13 *****
+2025-03-19 11:50:13 INFO:	Configuring BUSCO with local environment
+2025-03-19 11:50:13 INFO:	Mode is transcriptome
+2025-03-19 11:50:13 INFO:	Downloading information on latest versions of BUSCO data...
+2025-03-19 11:50:16 INFO:	Input file is /shared/ifbstor1/projects/rnasep/3a-AssemblyAssessment/Completeness/Trinity_rnasep2.Trinity.fasta
+2025-03-19 11:50:16 INFO:	Downloading file 'https://busco-data.ezlab.org/v5/data/lineages/mollusca_odb10.2024-01-08.tar.gz'
+2025-03-19 11:50:21 INFO:	Decompressing file '/shared/ifbstor1/projects/rnasep/3a-AssemblyAssessment/Completeness/busco_downloads/lineages/mollusca_odb10.tar.gz'
+2025-03-19 11:51:42 INFO:	Running BUSCO using lineage dataset mollusca_odb10 (eukaryota, 2024-01-08)
+2025-03-19 11:51:43 INFO:	Running 1 job(s) on metaeuk, starting at 03/19/2025 11:51:43
+2025-03-19 12:05:08 INFO:	[metaeuk]	1 of 1 task(s) completed
+2025-03-19 12:06:11 INFO:	***** Run HMMER on gene sequences *****
+2025-03-19 12:06:11 INFO:	Running 5295 job(s) on hmmsearch, starting at 03/19/2025 12:06:11
+2025-03-19 12:07:05 INFO:	[hmmsearch]	530 of 5295 task(s) completed
+2025-03-19 12:08:19 INFO:	[hmmsearch]	1059 of 5295 task(s) completed
+2025-03-19 12:10:28 INFO:	[hmmsearch]	1589 of 5295 task(s) completed
+2025-03-19 12:13:24 INFO:	[hmmsearch]	2118 of 5295 task(s) completed
+2025-03-19 12:15:49 INFO:	[hmmsearch]	2648 of 5295 task(s) completed
+2025-03-19 12:18:12 INFO:	[hmmsearch]	3177 of 5295 task(s) completed
+2025-03-19 12:19:48 INFO:	[hmmsearch]	3707 of 5295 task(s) completed
+2025-03-19 12:22:33 INFO:	[hmmsearch]	4236 of 5295 task(s) completed
+2025-03-19 12:23:45 INFO:	[hmmsearch]	4766 of 5295 task(s) completed
+2025-03-19 12:32:03 INFO:	[hmmsearch]	5295 of 5295 task(s) completed
+2025-03-19 12:46:45 INFO:	0 candidate overlapping regions found
+2025-03-19 12:46:45 INFO:	14832 exons in total
+2025-03-19 12:46:46 INFO:	Extracting missing and fragmented buscos from the file refseq_db.faa...
+2025-03-19 12:46:51 INFO:	Running 1 job(s) on metaeuk, starting at 03/19/2025 12:46:51
+2025-03-19 13:03:34 INFO:	[metaeuk]	1 of 1 task(s) completed
+2025-03-19 13:05:49 INFO:	***** Run HMMER on gene sequences *****
+2025-03-19 13:05:49 INFO:	Running 662 job(s) on hmmsearch, starting at 03/19/2025 13:05:49
+2025-03-19 13:06:05 INFO:	[hmmsearch]	67 of 662 task(s) completed
+2025-03-19 13:06:09 INFO:	[hmmsearch]	133 of 662 task(s) completed
+2025-03-19 13:06:13 INFO:	[hmmsearch]	199 of 662 task(s) completed
+2025-03-19 13:06:17 INFO:	[hmmsearch]	265 of 662 task(s) completed
+2025-03-19 13:06:22 INFO:	[hmmsearch]	332 of 662 task(s) completed
+2025-03-19 13:06:29 INFO:	[hmmsearch]	398 of 662 task(s) completed
+2025-03-19 13:06:37 INFO:	[hmmsearch]	464 of 662 task(s) completed
+2025-03-19 13:06:43 INFO:	[hmmsearch]	530 of 662 task(s) completed
+2025-03-19 13:06:51 INFO:	[hmmsearch]	596 of 662 task(s) completed
+2025-03-19 13:15:21 INFO:	[hmmsearch]	662 of 662 task(s) completed
+2025-03-19 13:29:59 INFO:	0 candidate overlapping regions found
+2025-03-19 13:29:59 INFO:	12242 exons in total
+2025-03-19 13:29:59 INFO:	Results:	C:87.5%[S:38.9%,D:48.6%],F:2.4%,M:10.1%,n:5295	   
+
+2025-03-19 13:31:13 INFO:	
+
+	---------------------------------------------------
+	|Results from dataset mollusca_odb10               |
+	---------------------------------------------------
+	|C:87.5%[S:38.9%,D:48.6%],F:2.4%,M:10.1%,n:5295    |
+	|4637	Complete BUSCOs (C)                        |
+	|2061	Complete and single-copy BUSCOs (S)        |
+	|2576	Complete and duplicated BUSCOs (D)         |
+	|125	Fragmented BUSCOs (F)                      |
+	|533	Missing BUSCOs (M)                         |
+	|5295	Total BUSCO groups searched                |
+	---------------------------------------------------
+2025-03-19 13:31:13 INFO:	BUSCO analysis done. Total running time: 6057 seconds
+2025-03-19 13:31:13 INFO:	Results written in /shared/ifbstor1/projects/rnasep/3a-AssemblyAssessment/Completeness/BUSCO_rnasep2
+2025-03-19 13:31:13 INFO:	For assistance with interpreting the results, please consult the userguide: https://busco.ezlab.org/busco_userguide.html
+
+2025-03-19 13:31:13 INFO:	Visit this page https://gitlab.com/ezlab/busco#how-to-cite-busco to see how to cite BUSCO

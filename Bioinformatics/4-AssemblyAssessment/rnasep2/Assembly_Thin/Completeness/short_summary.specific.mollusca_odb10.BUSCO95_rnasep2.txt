@@ -1,0 +1,19 @@
+# BUSCO version is: 5.5.0 
+# The lineage dataset is: mollusca_odb10 (Creation date: 2024-01-08, number of genomes: 7, number of BUSCOs: 5295)
+# Summarized benchmarking in BUSCO notation for file /shared/ifbstor1/projects/rnasep/4-AssemblyAssessment/Assembly_Thin/Completeness/Trinity_rnasep2.Trinity95.fasta
+# BUSCO was run in mode: euk_tran
+
+	***** Results: *****
+
+	C:87.2%[S:51.8%,D:35.4%],F:2.5%,M:10.3%,n:5295	   
+	4621	Complete BUSCOs (C)			   
+	2744	Complete and single-copy BUSCOs (S)	   
+	1877	Complete and duplicated BUSCOs (D)	   
+	131	Fragmented BUSCOs (F)			   
+	543	Missing BUSCOs (M)			   
+	5295	Total BUSCO groups searched		   
+
+Dependencies and versions:
+	hmmsearch: 3.1
+	metaeuk: 6.a5d39d9
+	busco: 5.5.0
