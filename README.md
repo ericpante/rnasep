@@ -21,9 +21,14 @@ Trimmomatic_v0.39
 ### 3. Assembling:
 
 bowtie_v2.5.1	; samtools_v1.14	; Jellyfish_v2.3.0
+
 Salmon_v1.10.1	; Python_v3.11.1	; Trinity_v2.15.1
 
-### 3a. Assembly quality assessment (https://github.com/trinityrnaseq/trinityrnaseq/wiki):
+### 3a. Assembly Thinning (to remove redundancy):
+
+cd-hit_v4.8.1
+
+### 4. Assembly quality assessment (https://github.com/trinityrnaseq/trinityrnaseq/wiki):
 
 -> ContigsN50: Trinity_v2.15.1
 
@@ -32,5 +37,13 @@ Salmon_v1.10.1	; Python_v3.11.1	; Trinity_v2.15.1
 -> Completness: BUSCO_v5.5.0
 
 -> Full-length transcript analysis: BLAST_v2.16.0
+
+-> Read content: STAR_v2.7.11a
+
+### 5. Assembly annotation
+
+TransDecoder_V5.7.0	; BLAST_v2.16.0 
+
+eggnog-mapper_v2.1.12	; Interproscan_v5.72-103.0
 
 
