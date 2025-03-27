@@ -1,11 +1,11 @@
 ############################################
 
-# Merging blastx & blastp outputs from the rnasep2_Trinity95_assembly
+# Merging blastx & blastp & EggNog outputs from the rnasep2_Trinity95_assembly
 
 ############################################
 
-# Merging blastx & blastp output
-Merge_blast <- function(X,P){
+# Merging blastx & blastp outputs
+Blast_annot <- function(X,P){
   merge(X,P, by="Transcript", all=TRUE, no.dups=TRUE) %>%
     select(!DataBase.y) %>%
     rename(DataBase=DataBase.x,
@@ -14,4 +14,9 @@ Merge_blast <- function(X,P){
            ProteinCodeP=ProteinCode.y,
            ProteinNameP=ProteinName.y)
     
+}
+
+# Merging blast & EggNog outputs
+Full_annot <- function(BlastAnnot,eggnog.nt.tidy){
+  merge(BlastAnnot,eggnog.nt.tidy, by="Transcript", all=TRUE, no.dups=TRUE)
 }
