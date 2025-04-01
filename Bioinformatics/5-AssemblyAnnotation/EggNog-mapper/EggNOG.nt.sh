@@ -18,7 +18,9 @@ cd /shared/projects/rnasep/5-AssemblyAnnotation/EggNOG/
 export EGGNOG_DATA_DIR=/shared/projects/rnasep/5-AssemblyAnnotation/EggNOG/data/
 
 #Defining variables
-QUERY=Trinity_rnasep2.Trinity95.fasta
+QUERY=Trinity_rnasep2.Trinity95.fasta.transdecoder.cds
 OUTDIR=/shared/projects/rnasep/5-AssemblyAnnotation/EggNOG/outputNT
+GFF=/shared/projects/rnasep/5-AssemblyAnnotation/EggNOG/Trinity_rnasep2.Trinity95.fasta.transdecoder.WB.gff3
+#This is gff3 file from TransDecoder without empty lines
 
-emapper.py -i ${QUERY} --itype CDS -m diamond --evalue 0.001 --tax_scope auto --target_orthologs all --go_evidence all --pfam_realign none --output_dir ${OUTDIR} -o rnasep2_Trinity95.nt --excel --cpu 20 
+emapper.py -i ${QUERY} --itype CDS -m diamond --evalue 0.001 --tax_scope auto --target_orthologs all --go_evidence all --pfam_realign none --output_dir ${OUTDIR} -o rnasep2_Trinity95.nt --excel --decorate_gff ${GFF} --cpu 20 
