@@ -15,8 +15,3 @@ Blast_annot <- function(X,P){
            ProteinNameP=ProteinName.y)
     
 }
-
-# Merging blast & EggNog outputs
-Full_annot <- function(BlastAnnot,eggnog.nt.tidy){
-  merge(BlastAnnot,eggnog.nt.tidy, by="Transcript", all=TRUE, no.dups=TRUE)
-}
