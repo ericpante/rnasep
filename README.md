@@ -40,6 +40,8 @@ cd-hit_v4.8.1
 
 -> Read content: STAR_v2.7.11a
 
+-> Various statistics: TransRate_v1.0.3
+
 ### 5. Assembly annotation
 
 TransDecoder_V5.7.0	; BLAST_v2.16.0 
