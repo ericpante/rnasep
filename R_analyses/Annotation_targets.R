@@ -6,7 +6,7 @@ library(visNetwork)
 
 # Set target options:
 tar_option_set(
-  packages = c("dplyr","tidyr", "readxl", "readr", "ggplot2"))
+  packages = c("dplyr","tidyr", "readxl", "readr", "ggplot2", "wesanderson"))
 
 # Run the R scripts in the R/ folder with your custom functions:
 tar_source("R/Annotation/01-LoadBlast.R")
@@ -19,6 +19,9 @@ tar_source("R/Annotation/07-eggnog_tidy.R")
 tar_source("R/Annotation/08-eggnog_merge.R")
 tar_source("R/Annotation/09-Full_annot.R")
 tar_source("R/Annotation/10-ExportFile.R")
+tar_source("R/Annotation/11-LoadReactome.R")
+tar_source("R/Annotation/12-TidyReactome.R")
+tar_source("R/Annotation/13-PlotReactome.R")
 
 
 # Replace the target list below with your own:
@@ -44,7 +47,12 @@ list(
   tar_target(EG.nt, Tidy_eggnog(eggnog.nt)),
   tar_target(EggnogAnnot, Eggnog_annot(EG.nt, EG)),
   tar_target(FullAnnot, Full_annot(BlastAnnot,EggnogAnnot)),
-  tar_target(FinalAnnot, FileExport(FullAnnot, "results/Annotation/files/rnasep2_Trinity95_FunctionalAnnotation.csv"))
+  tar_target(FinalAnnot, FileExport(FullAnnot, "results/Annotation/files/rnasep2_Trinity95_FunctionalAnnotation.csv")),
+  tar_target(file5, "data/annotation/REACTOME.csv"),
+  tar_target(Reactome, load_reac(file5)),
+  tar_target(ReactomeTidy, tidy_reac(Reactome)),
+  tar_target(PlotReactome, PlotReac(ReactomeTidy)),
+  tar_target(ExportReactome, PlotExport("results/Annotation/figures/Reactome.png",PlotReactome))
   )
 
 #############################################
@@ -59,6 +67,6 @@ list(
 
 # tar_visnetwork(physics=TRUE)
 
-# tar_make()
+# tar_make(PlotReac)
 
 # tar_read(FullAnnot)
