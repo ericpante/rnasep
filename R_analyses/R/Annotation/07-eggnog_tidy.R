@@ -15,8 +15,9 @@ load_eggnog <- function(file3){
 
 Tidy_eggnog <- function(data){
   as.data.frame(data) %>%
-    select(query,Description,Preferred_name,GOs,KEGG_ko,KEGG_Pathway) %>%
+    select(query,COG_category,Description,Preferred_name,GOs,KEGG_ko,KEGG_Pathway) %>%
     rename(Transcript=query,
+           EG_KOG=COG_category,
            EG_Description=Description,
            EG_Name=Preferred_name,
            EG_GOs=GOs,
