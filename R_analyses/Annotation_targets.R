@@ -15,58 +15,52 @@ tar_option_set(
   packages = c("dplyr","tidyr", "readxl", "readr", "ggplot2", "wesanderson", "data.table"))
 
 # Run the R scripts in the R/ folder with your custom functions:
-tar_source("R/Annotation/01-LoadBlast.R")
-tar_source("R/Annotation/02-Prep_evalue.R")
-tar_source("R/Annotation/03-Plot_evalue.R")
-tar_source("R/Annotation/04-PlotExport.R")
-tar_source("R/Annotation/05-Blast_tidy.R")
-tar_source("R/Annotation/06-Blast_merge.R")
-tar_source("R/Annotation/07-eggnog_tidy.R")
-tar_source("R/Annotation/08-eggnog_merge.R")
-tar_source("R/Annotation/09-Full_annot.R")
-tar_source("R/Annotation/10-ExportFile.R")
-tar_source("R/Annotation/11-LoadReactome.R")
-tar_source("R/Annotation/12-TidyReactome.R")
-tar_source("R/Annotation/13-PlotReactome.R")
-tar_source("R/Annotation/14-GO_Namespace_Correspondance.R")
-tar_source("R/Annotation/15-GOsummary.R")
+tar_source("R/Annotation/01-Blast_Load_Summarize_Plot.R")
+tar_source("R/Annotation/02-PlotExport.R")
+tar_source("R/Annotation/03-Blast_tidy.R")
+tar_source("R/Annotation/04-eggnog_Load_Tidy_Merge.R")
+tar_source("R/Annotation/05-Full_annot.R")
+tar_source("R/Annotation/06-ExportFile.R")
+tar_source("R/Annotation/07-Reactome_Load_Tidy_Plot.R")
+tar_source("R/Annotation/08-GO_Namespace_Correspondance.R")
+tar_source("R/Annotation/09-GOsummary.R")
 
 
 # Replace the target list below with your own:
 list(
 #########################################################################################  
   tar_target(file1, "data/annotation/rnasep2_Trinity95.blastx.outfmt6"),                #
-  tar_target(blastx, load_blast(file1)),                                                #
+  tar_target(blastx, load_blast(file1)),                                                # Scripts 1 & 2
   tar_target(ePropX, Prep_evalue(blastx)),                                              # Loading, processing & plotting blastx e-values
   tar_target(ePlotX, PlotEvalue(ePropX)),                                               #
   tar_target(PlotX, PlotExport("results/Annotation/figures/BlastX.eValue.png",ePlotX)), #
 #########################################################################################
   tar_target(file2, "data/annotation/rnasep2_Trinity95.blastp.outfmt6"),                #
-  tar_target(blastp, load_blast(file2)),                                                #
-  tar_target(ePropP, Prep_evalue(blastp)),                                              # Loading, processing @ plotting blastp e-values
+  tar_target(blastp, load_blast(file2)),                                                # Scripts 1 & 2
+  tar_target(ePropP, Prep_evalue(blastp)),                                              # Loading, processing & plotting blastp e-values
   tar_target(ePlotP, PlotEvalue(ePropP)),                                               #
   tar_target(PlotP, PlotExport("results/Annotation/figures/BlastP.eValue.png",ePlotP)), #
 #########################################################################################
-  tar_target(X, Tidy_blast(blastx)),                                                    #
+  tar_target(X, Tidy_blast(blastx)),                                                    # Script 3
   tar_target(P, Tidy_blast(blastp)),                                                    # Tidying & merging blastx and blastp annotations 
   tar_target(BlastAnnot, Blast_annot(X,P)),                                             #
 #########################################################################################
 #########################################################################################
   tar_target(file3,"data/annotation/rnasep2_Trinity95.emapper.annotations.xlsx"),       #
   tar_target(eggnog, load_eggnog(file3)),                                               #
-  tar_target(EG, Tidy_eggnog(eggnog)),                                                  #
+  tar_target(EG, Tidy_eggnog(eggnog)),                                                  # Script 4
   tar_target(file4,"data/annotation/rnasep2_Trinity95.nt.emapper.annotations.xlsx"),    # Loading, tidying & merging EggNOG and EggNOG.nt outputs
   tar_target(eggnog.nt, load_eggnog(file4)),                                            #
   tar_target(EG.nt, Tidy_eggnog(eggnog.nt)),                                            #
   tar_target(EggnogAnnot, Eggnog_annot(EG.nt, EG)),                                     #
 #########################################################################################
 #########################################################################################################################
-  tar_target(FullAnnot, Full_annot(BlastAnnot,EggnogAnnot)),                                                            # Building & exporting full annotation file
-  tar_target(FinalAnnot, FileExport(FullAnnot, "results/Annotation/files/rnasep2_Trinity95_FunctionalAnnotation.csv")), #
+  tar_target(FullAnnot, Full_annot(BlastAnnot,EggnogAnnot)),                                                            # Script 5
+  tar_target(FinalAnnot, FileExport(FullAnnot, "results/Annotation/files/rnasep2_Trinity95_FunctionalAnnotation.csv")), # Building & exporting full annotation file
 #########################################################################################################################
 ###################################################################################################
   tar_target(file5, "data/annotation/REACTOME.csv"),                                              #
-  tar_target(Reactome, load_reac(file5)),                                                         #
+  tar_target(Reactome, load_reac(file5)),                                                         # Script 7
   tar_target(ReactomeTidy, tidy_reac(Reactome)),                                                  # Loading, tidying & plotting REACTOME results
   tar_target(PlotReactome, PlotReac(ReactomeTidy)),                                               #
   tar_target(ExportReactome, PlotExport("results/Annotation/figures/Reactome.png",PlotReactome)), #
@@ -93,6 +87,6 @@ list(
 
 # tar_visnetwork(physics=TRUE)
 
-# tar_make(ExportGO)
+# tar_make()
 
 # tar_read(FullAnnot)
