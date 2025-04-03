@@ -14,13 +14,13 @@ The differential expression analysis was performed using R language.
 ## A great attention is paid to the workflow reproducibility.
 
 Therefore, all the bioinformatics tools are given above with the version used and the folders and scripts are numbered based on their execution order.
-Regarding R workflow, the 'renv' package was used to ensure the portability of the project library.
-In addition, the 'target' package was used for workflow management, so it is fully reproducible.
+Regarding R workflow, the *renv* package was used to ensure the portability of the project library.
+In addition, the *target* package was used for workflow management, so it is fully reproducible.
 To easily reproduce this R project, one just need to:
-| 	1- download the whole R_analysis folder on its own machine;
-|	2- download the appropriate data in a folder called "data" located at the root of the project
-|	3- charging the project library with 'renv::restore()';
-|	4- run the *_targets.R scripts
+1. download the whole R_analysis folder on its own machine;
+2. download the appropriate data in a folder called "data" located at the root of the project
+3. charging the project library with `renv::restore()`;
+4. run the *_targets.R scripts
 
 <img src="Workflow.png" width="600"/>
 
