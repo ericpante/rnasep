@@ -2,10 +2,27 @@
 #				RNAsep PROJECT				###
 ###########################################################################
 
-Testing for transcriptomic effects of Hg x pCO2 on Sepia officinalis embryos and juvéniles (head tissues).
+Testing for transcriptomic effects of Hg x pCO2 on Sepia officinalis juveniles (head tissues).
 
+This project is divided in two part : (i) *de novo* transcriptome assembly and annotation ; (ii) differential expression analysis.
 
-<img src="Workflow.png" width="400"/>
+The assembly and annotation were performed on the IFB-Core cluster.
+
+The differential expression analysis was performed using R language. 
+
+#############################################################
+## A great attention is paid to the workflow reproducibility.
+
+Therefore, all the bioinformatics tools are given above with the version used and the folders and scripts are numbered based on their execution order.
+Regarding R workflow, the 'renv' package was used to ensure the portability of the project library.
+In addition, the 'target' package was used for workflow management, so it is fully reproducible.
+To easily reproduce this R project, one just need to:
+| 	1- download the whole R_analysis folder on its own machine;
+|	2- download the appropriate data in a folder called "data" located at the root of the project
+|	3- charging the project library with 'renv::restore()';
+|	4- run the *_targets.R scripts
+
+<img src="Workflow.png" width="600"/>
 
 #######################################################
 ## Bioinformatic Tools and versions for data processing
@@ -46,6 +63,12 @@ cd-hit_v4.8.1
 
 TransDecoder_V5.7.0	; BLAST_v2.16.0 
 
-eggnog-mapper_v2.1.12	; Interproscan_v5.72-103.0
+eggnog-mapper_v2.1.12	; Reactome : https://reactome.org/PathwayBrowser/#TOOL=AT
+
+### 6. Alignment
+
+STAR_v2.7.11a
+
+
 
 
