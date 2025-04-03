@@ -10,7 +10,7 @@ The assembly and annotation were performed on the IFB-Core cluster.
 
 The differential expression analysis was performed using R language. 
 
-#############################################################
+##########################################################################
 ## A great attention is paid to the workflow reproducibility.
 
 Therefore, all the bioinformatics tools are given above with the version used and the folders and scripts are numbered based on their execution order.
