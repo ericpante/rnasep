@@ -1,9 +1,9 @@
 #!/bin/bash
 #SBATCH -p long
-#SBATCH -J Trinity_test_6_Ech
-#SBATCH --cpus-per-task=16
+#SBATCH -J Trinity_18_Ech
+#SBATCH --cpus-per-task=30
 #SBATCH --mem-per-cpu=50G
-#SBATCH -t 15:00:00
+#SBATCH -t 30:00:00
 #SBATCH --error=trinity_%j.err
 #SBATCH --output=trinity_%j.out
 
@@ -16,10 +16,10 @@ module purge
 module load trinity/2.15.1
 module load salmon/1.10.2
 
-cd /shared/projects/rnasep/3-Assembling/
+cd /shared/projects/rnasep/3-Assembling/rnasep1/
 
 #Defining variables
-SAMPLE=Trinity-Config-Test.txt
-OUTPUT=Trinity_test
+SAMPLE=Trinity-Config.txt
+OUTPUT=Trinity_rnasep1
 
-Trinity --seqType fq --max_memory 50G --samples_file ${SAMPLE} --SS_lib_type FR --CPU 16 --output ${OUTPUT}
+Trinity --seqType fq --max_memory 50G --samples_file ${SAMPLE} --SS_lib_type FR --CPU 30 --output ${OUTPUT}
