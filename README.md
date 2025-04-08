@@ -1,5 +1,5 @@
 ###########################################################################
-#				RNAsep PROJECT				###
+#		RNAsep PROJECT - PRJEB88225 (not released yet)		###
 ###########################################################################
 
 Testing for transcriptomic effects of Hg x pCO2 on Sepia officinalis juveniles (head tissues).
