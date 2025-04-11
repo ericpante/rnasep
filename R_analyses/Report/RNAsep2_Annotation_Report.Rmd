@@ -1,5 +1,5 @@
 ---
-title: "RNAsep2 Assembly & Annotation Report"
+title: "RNAsep Assemblies & Annotation Report"
 author: "Thomas Sol Dourdin"
 date: "2025-04-09"
 output: html_document
@@ -30,14 +30,14 @@ kable(table) %>%
 
 | Based on this assessment, we can assume that **the assembly is of good quality** in terms of transcripts length and representation of conserved transcripts.
 
-# **Assembly structural and functional annotation**
+## **Assembly structural and functional annotation**
 
-## **Structural annotation**
+### **Structural annotation**
 
-| The identification of potentially protein-coding regions in transcripts was performed with *TransDecoder* on the thinned assembly. Overall, 49402 ORFs were identified and then submited to functional annotation.
+| The identification of potentially protein-coding regions in transcripts was performed with *TransDecoder* on the thinned assembly. Overall, **49402 ORFs** were identified and then submited to functional annotation.
 
 
-## **Functional annotation**
+### **Functional annotation**
 
 | Several tools were used to annotate the assembly :
 
@@ -62,9 +62,39 @@ tar_read(PlotReactome)
 tar_read(SumPlot)
 ```
 
+
+# **RNAsep1 Transcriptome Assembly**
+
+| The RNAsep2 transcriptome assembly was carried out using 4 samples from each condition (*c.a.* 16 samples) after raw data trimming and quality filtering.
+The assembly was performed with the *Trinity* suite, then thinned with *cd-hit* to remove redundancy and several metrics were calculated in order to assess its quality. The thinned assembly is 168,199,874 bp long (~168.10^6^ bp). Given the assembly length, the mean length of trimmed reads (146 bp) and the mean number of paired-end reads per sample (9.10^6), **the average sequencing depth per sample is about ???X**.
+
+| The results of the assembly quality assessment are summarized in the following table:
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+library(readxl)
+library(knitr)
+library(kableExtra)
+table1 <- read_excel("Report/rnasep1_Stats_summary.xlsx")
+kable(table1) %>%
+  kable_styling(full_width=FALSE, bootstrap_options = c("striped", "hover", "condensed", "bordered")) %>%
+  pack_rows("Completeness - BUSCO", 13, 16) %>%
+  pack_rows("FullLength - Blastx", 17, 18) %>%
+  pack_rows("ReadContent - STAR", 19, 19)
+```
+
+| Based on this assessment, we can assume that **the assembly is of good quality** in terms of transcripts length and representation of conserved transcripts.
+
+## **Assembly structural and functional annotation**
+
+### **Structural annotation**
+
+| The identification of potentially protein-coding regions in transcripts was performed with *TransDecoder* on the thinned assembly. Overall, **39804 ORFs** were identified and then submited to functional annotation.
+
+
 # **Current state of the annotation R workflow**
 
 ```{r echo=FALSE, warning=FALSE, message=FALSE}
 tar_visnetwork(physics=TRUE)
 ```
+
 
