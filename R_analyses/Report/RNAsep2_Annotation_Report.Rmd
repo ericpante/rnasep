@@ -1,0 +1,71 @@
+---
+title: "RNAsep2 Assembly & Annotation Report"
+author: "Thomas Sol Dourdin"
+date: "2025-04-09"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# **RNAsep2 Transcriptome Assembly**
+
+| The RNAsep2 transcriptome assembly was carried out using 4 samples from each condition (*c.a.* 16 samples) after raw data trimming and quality filtering.
+The assembly was performed with the *Trinity* suite, then thinned with *cd-hit* to remoce redundancy and several metrics were calculated in order to assess its quality.
+The results of the assembly quality assessment are summarized in the following table:
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+library(readxl)
+library(knitr)
+library(kableExtra)
+table <- read_excel("Report/rnasep2_Stats_summary.xlsx")
+kable(table) %>%
+  kable_styling(full_width=FALSE, bootstrap_options = c("striped", "hover", "condensed", "bordered")) %>%
+  pack_rows("Completeness - BUSCO", 13, 16) %>%
+  pack_rows("FullLength - Blastx", 17, 18) %>%
+  pack_rows("ReadContent - STAR", 19, 19)
+```
+
+| Based on this assessment, we can assume that **the assembly is of good quality** in terms of transcripts length and representation of conserved transcripts.
+
+# **Assembly structural and functional annotation**
+
+## **Structural annotation**
+
+The identification of potentially protein-coding regions in transcripts was performed with *TransDecoder* on the thinned assembly. Overall, 49402 ORFs were identified and then submited to functional annotation.
+
+
+## **Functional annotation**
+Several tools were used to annotate the assembly :
+
++ **BLAST (x & p)** annotated 32746 transcripts against the SwissProt UniProt database;
+
++ **EggNOG-mapper** identified 32259 orthologous hits and annotated 24257 transcripts with GO terms, 22222 transcripts with KEGG_ko, 11977 transcripts associated to KEGG_pathways and 32544 transcripts matching PFAM entries. The occurrence of the top 20 GO terms by spacename are represented in the following figure:
+
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+tar_read(GOPlot)
+```
+
+
++ **Reactome** was also used to predict the pathways in which the assembled transcripts were involved. The following figure shows the number of transcripts related to the main Reactome pathways:
+
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+tar_read(PlotReactome)
+```
+
+
+Finally, the efficiency of each annotation type is summarised in the figure below:
+
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+tar_read(SumPlot)
+```
+
+
+# **Current state of the annotation R workflow**
+
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+tar_visnetwork(physics=TRUE)
+```
+

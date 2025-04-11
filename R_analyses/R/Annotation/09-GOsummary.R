@@ -10,13 +10,13 @@
 summarizeGO <- function(data, go){
   # retrieving GO terms from the AggNOG output counting Go occurences 
   Data <- data %>%
-    select(Transcript, EG_GOs.x) %>% 
-    filter(EG_GOs.x != "-") %>%
-    separate_rows(EG_GOs.x, sep=",") %>%
-    count(EG_GOs.x)
+    select(Transcript, GOs) %>% 
+    filter(GOs != "-") %>%
+    separate_rows(GOs, sep=",") %>%
+    count(GOs)
   
   # Adding Names and Namespaces to the GO terms
-  Final <- merge(Data, go, by.x="EG_GOs.x", by.y="GO_term", all.x=TRUE)
+  Final <- merge(Data, go, by.x="GOs", by.y="GO_term", all.x=TRUE)
   
   return(Final)
 }
@@ -28,21 +28,21 @@ PlotGO <- function(data, NS1, NS2, NS3){
   x <- data %>%
     filter(Namespace==NS1) %>%
     arrange(desc(n)) %>%
-    unite(GOterms, EG_GOs.x,Name, sep="-")
+    unite(GOterms, GOs,Name, sep="-")
   
   X <- x[2:21,]
   
   y <- data %>%
     filter(Namespace==NS2) %>%
     arrange(desc(n)) %>%
-    unite(GOterms, EG_GOs.x,Name, sep="-")
+    unite(GOterms, GOs,Name, sep="-")
   
   Y <- y[2:21,]
   
   z <- data %>%
     filter(Namespace==NS3) %>%
     arrange(desc(n)) %>%
-    unite(GOterms, EG_GOs.x,Name, sep="-")
+    unite(GOterms, GOs,Name, sep="-")
   
   Z <- z[2:21,]
   
