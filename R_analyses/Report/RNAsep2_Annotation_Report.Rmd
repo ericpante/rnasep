@@ -12,9 +12,9 @@ knitr::opts_chunk$set(echo = TRUE)
 # **RNAsep2 Transcriptome Assembly**
 
 | The RNAsep2 transcriptome assembly was carried out using 4 samples from each condition (*c.a.* 16 samples) after raw data trimming and quality filtering.
-The assembly was performed with the *Trinity* suite, then thinned with *cd-hit* to remoce redundancy and several metrics were calculated in order to assess its quality.
-The results of the assembly quality assessment are summarized in the following table:
+The assembly was performed with the *Trinity* suite, then thinned with *cd-hit* to remove redundancy and several metrics were calculated in order to assess its quality. The thinned assembly is 229,360,960 bp long (~230.10^6^ bp). Given the assembly length, the mean length of trimmed reads (146 bp) and the mean number of paired-end reads per sample (19.10^6), **the average sequencing depth per sample is about 24X**.
 
+| The results of the assembly quality assessment are summarized in the following table:
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
 library(readxl)
@@ -34,11 +34,12 @@ kable(table) %>%
 
 ## **Structural annotation**
 
-The identification of potentially protein-coding regions in transcripts was performed with *TransDecoder* on the thinned assembly. Overall, 49402 ORFs were identified and then submited to functional annotation.
+| The identification of potentially protein-coding regions in transcripts was performed with *TransDecoder* on the thinned assembly. Overall, 49402 ORFs were identified and then submited to functional annotation.
 
 
 ## **Functional annotation**
-Several tools were used to annotate the assembly :
+
+| Several tools were used to annotate the assembly :
 
 + **BLAST (x & p)** annotated 32746 transcripts against the SwissProt UniProt database;
 
@@ -48,7 +49,6 @@ Several tools were used to annotate the assembly :
 tar_read(GOPlot)
 ```
 
-
 + **Reactome** was also used to predict the pathways in which the assembled transcripts were involved. The following figure shows the number of transcripts related to the main Reactome pathways:
 
 ```{r echo=FALSE, warning=FALSE, message=FALSE}
@@ -56,12 +56,11 @@ tar_read(PlotReactome)
 ```
 
 
-Finally, the efficiency of each annotation type is summarised in the figure below:
+| Finally, the efficiency of each annotation type is summarised in the figure below:
 
 ```{r echo=FALSE, warning=FALSE, message=FALSE}
 tar_read(SumPlot)
 ```
-
 
 # **Current state of the annotation R workflow**
 

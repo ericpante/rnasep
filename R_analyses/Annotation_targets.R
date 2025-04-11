@@ -96,6 +96,6 @@ list(
 
 # tar_visnetwork(physics=TRUE)
 
-# tar_make(ExportSum)
+# tar_make(report)
 
 # tar_read(GO_summary)
