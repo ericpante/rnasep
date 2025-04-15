@@ -13,7 +13,7 @@ library(tarchetypes)
 
 # Set target options:
 tar_option_set(
-  packages = c("dplyr","tidyr", "readxl", "readr", "ggplot2", "wesanderson", "data.table"))
+  packages = c("dplyr","tidyr", "readxl", "readr", "ggplot2", "wesanderson", "data.table", "VennDiagram"))
 
 # Run the R scripts in the R/ folder with your custom functions:
 tar_source("R/Annotation/01-Blast_Load_Summarize_Plot.R")
@@ -26,10 +26,13 @@ tar_source("R/Annotation/07-Reactome_Load_Tidy_Plot.R")
 tar_source("R/Annotation/08-GO_Namespace_Correspondance.R")
 tar_source("R/Annotation/09-GOsummary.R")
 tar_source("R/Annotation/10-SumAnnotation.R")
+tar_source("R/Annotation/11-CompareAssembliesVenn.R")
 
 
 # Replace the target list below with your own:
 list(
+#########################################################################################  
+##################################### RNA SEP2 ##########################################  
 #########################################################################################  
   tar_target(file1, "data/annotation/rnasep2_Trinity95.blastx.outfmt6"),                #
   tar_target(blastx, load_blast(file1)),                                                # Scripts 1 & 2
@@ -79,9 +82,47 @@ list(
   tar_target(ExportSum, PlotExport("results/Annotation/figures/SumAnnotation.png", SumPlot)),           # Calculating & plotting the percentage of transsccripts that are annotated
 #########################################################################################################
 #########################################################################################################
-  tar_render(report, path='Report/RNAsep2_Annotation_Report.Rmd')                                       # Building a quick report
-#########################################################################################################
-#########################################################################################################
+#########################################################################################  
+##################################### RNA SEP1 ##########################################  
+#########################################################################################
+  tar_target(file7,"data/annotation/rnasep1_Trinity95.emapper.annotations.xlsx"),       #
+  tar_target(eggnog.SEP1, load_eggnog(file7)),                                          # 
+  tar_target(file8,"data/annotation/rnasep1_Trinity95.nt.emapper.annotations.xlsx"),    # 
+  tar_target(eggnog.nt.SEP1, load_eggnog(file8)),                                       # Script 4
+  tar_target(EG.nt.SEP1, Tidy_eggnog(eggnog.nt.SEP1, eggnog.SEP1, filter_on=TRUE)),     # Loading, tidying & merging EggNOG and EggNOG.nt outputs
+  tar_target(EG.SEP1, Tidy_eggnog(eggnog.SEP1, eggnog.nt.SEP1, filter_on=FALSE)),       # 
+  tar_target(EggnogAnnot.SEP1, Eggnog_annot(EG.nt.SEP1, EG.SEP1)),                      #
+#########################################################################################
+#####################################################################################################################
+  tar_target(GO_summary.SEP1, summarizeGO(EggnogAnnot.SEP1, GOterms)),                                              # Script 8 & 9
+  tar_target(GOPlot.SEP1, PlotGO(GO_summary.SEP1,"biological_process","molecular_function","cellular_component")),  # Building and plotting main GO terms of each Namespace SEP1
+  tar_target(ExportGO.SEP1, PlotExport("results/Annotation/figures/MainGOterms.SEP1.png", GOPlot.SEP1)),            #
+#####################################################################################################################
+#####################################################################################################################
+###############################################################################################
+################################### SEP1 & SEP2 ###############################################
+###############################################################################################
+  tar_target(file9, "data/annotation/Trinity_rnasep1.Trinity95.fasta.transdecoder.gff3"),     #
+  tar_target(file10, "data/annotation/Trinity_rnasep2.Trinity95.fasta.transdecoder.gff3"),    #
+  tar_target(file11, "data/annotation/SEP1.SEP2.blastn.outfmt6"),                             #
+  tar_target(VennData, BuildVennData(file9,file10,file11)),                                   #
+  tar_target(Venn, displayVenn(VennData,                                                      #
+                               category.names=c("SEP2", "SEP1"),                              #
+                               lwd=2,                                                         #
+                               lty=4,                                                         # Script 11
+                               fill=wes_palette(n=2, name="GrandBudapest2"),                  # Comparing ORF content from SEP1 & 2 assemblies
+                               cex=1.2,                                                       #
+                               fontface="italic",                                             #
+                               cat.cex=1.3,                                                   #
+                               cat.fontface="bold",                                           #
+                               cat.default.pos="outer",                                       #
+                               cat.dist=c(0.02, 0.02))),                                      #
+  tar_target(VennExport, PlotExport("results/Annotation/figures/Venn.SEP1.SEP2.png", Venn)),  #
+###############################################################################################
+#######################################################################################
+  tar_render(report, path='Report/RNAsep2_Annotation_Report.Rmd')                     # Building a quick report
+#######################################################################################
+#######################################################################################
   )
 
 #############################################
@@ -96,6 +137,6 @@ list(
 
 # tar_visnetwork(physics=TRUE)
 
-# tar_make(report)
+# tar_make()
 
-# tar_read(GO_summary)
+# tar_read(Venn)
