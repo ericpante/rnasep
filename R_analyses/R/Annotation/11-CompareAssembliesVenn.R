@@ -9,8 +9,8 @@
 BuildVennData <- function(fileA, fileB, fileC){
   
   # Loading files
-  sep1 <- read.delim(fileA, header=TRUE)
-  sep2 <- read.delim(fileB, header=TRUE)
+  sep1 <- read.delim(fileA, header=FALSE)
+  sep2 <- read.delim(fileB, header=FALSE)
   blast <- read.delim(fileC, header=FALSE)
   
   # Changing col names for sep1 & 2

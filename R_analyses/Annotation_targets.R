@@ -82,30 +82,63 @@ list(
   tar_target(ExportSum, PlotExport("results/Annotation/figures/SumAnnotation.png", SumPlot)),           # Calculating & plotting the percentage of transsccripts that are annotated
 #########################################################################################################
 #########################################################################################################
-#########################################################################################  
-##################################### RNA SEP1 ##########################################  
+######################################################################################################### 
+##################################### RNA SEP1 #########################################################
+########################################################################################################
+########################################################################################################
+  tar_target(file7, "data/annotation/rnasep1_Trinity95.blastx.outfmt6"),                               #
+  tar_target(blastx.SEP1, load_blast(file7)),                                                          # Scripts 1 & 2
+  tar_target(ePropX.SEP1, Prep_evalue(blastx.SEP1)),                                                   # Loading, processing & plotting blastx e-values SEP1
+  tar_target(ePlotX.SEP1, PlotEvalue(ePropX.SEP1)),                                                    #
+  tar_target(PlotX.SEP1, PlotExport("results/Annotation/figures/BlastX.eValue.SEP1.png",ePlotX.SEP1)), #
+########################################################################################################
+  tar_target(file8, "data/annotation/rnasep1_Trinity95.blastp.outfmt6"),                               #
+  tar_target(blastp.SEP1, load_blast(file8)),                                                          # Scripts 1 & 2
+  tar_target(ePropP.SEP1, Prep_evalue(blastp.SEP1)),                                                   # Loading, processing & plotting blastp e-values SEP1
+  tar_target(ePlotP.SEP1, PlotEvalue(ePropP.SEP1)),                                                    #
+  tar_target(PlotP.SEP1, PlotExport("results/Annotation/figures/BlastP.eValue.SEP1.png",ePlotP.SEP1)), #
+########################################################################################################
+  tar_target(X.SEP1, Tidy_blast(blastx.SEP1, blastp.SEP1, filter_on=TRUE)),                            # Script 3
+  tar_target(P.SEP1, Tidy_blast(blastp.SEP1, blastx.SEP1, filter_on=FALSE)),                           # Tidying & merging blastx and blastp annotations SEP1
+  tar_target(BlastAnnot.SEP1, Blast_annot(X.SEP1,P.SEP1)),                                             #
+########################################################################################################
 #########################################################################################
-  tar_target(file7,"data/annotation/rnasep1_Trinity95.emapper.annotations.xlsx"),       #
-  tar_target(eggnog.SEP1, load_eggnog(file7)),                                          # 
-  tar_target(file8,"data/annotation/rnasep1_Trinity95.nt.emapper.annotations.xlsx"),    # 
-  tar_target(eggnog.nt.SEP1, load_eggnog(file8)),                                       # Script 4
-  tar_target(EG.nt.SEP1, Tidy_eggnog(eggnog.nt.SEP1, eggnog.SEP1, filter_on=TRUE)),     # Loading, tidying & merging EggNOG and EggNOG.nt outputs
+  tar_target(file9,"data/annotation/rnasep1_Trinity95.emapper.annotations.xlsx"),       #
+  tar_target(eggnog.SEP1, load_eggnog(file9)),                                            
+  tar_target(file10,"data/annotation/rnasep1_Trinity95.nt.emapper.annotations.xlsx"),   # 
+  tar_target(eggnog.nt.SEP1, load_eggnog(file10)),                                      # Script 4
+  tar_target(EG.nt.SEP1, Tidy_eggnog(eggnog.nt.SEP1, eggnog.SEP1, filter_on=TRUE)),     # Loading, tidying & merging EggNOG and EggNOG.nt outputs SEP1
   tar_target(EG.SEP1, Tidy_eggnog(eggnog.SEP1, eggnog.nt.SEP1, filter_on=FALSE)),       # 
   tar_target(EggnogAnnot.SEP1, Eggnog_annot(EG.nt.SEP1, EG.SEP1)),                      #
 #########################################################################################
+#################################################################################################################################
+  tar_target(FullAnnot.SEP1, Full_annot(BlastAnnot.SEP1,EggnogAnnot.SEP1)),                                                       # Scripts 5 & 6
+  tar_target(FinalAnnot.SEP1, FileExport(FullAnnot.SEP1, "results/Annotation/files/rnasep1_Trinity95_FunctionalAnnotation.csv")), # Building & exporting full annotation file SEP1
+#################################################################################################################################
+#################################################################################################################
+  tar_target(file11, "data/annotation/REACTOME.SEP1.csv"),                                                      #
+  tar_target(Reactome.SEP1, load_reac(file11)),                                                                 # Scripts 2 & 7
+  tar_target(ReactomeTidy.SEP1, tidy_reac(Reactome.SEP1)),                                                      # Loading, tidying & plotting REACTOME results SEP1
+  tar_target(PlotReactome.SEP1, PlotReac(ReactomeTidy.SEP1)),                                                   #
+  tar_target(ExportReactome.SEP1, PlotExport("results/Annotation/figures/Reactome.SEP1.png",PlotReactome.SEP1)),#
+#################################################################################################################
 #####################################################################################################################
   tar_target(GO_summary.SEP1, summarizeGO(EggnogAnnot.SEP1, GOterms)),                                              # Script 8 & 9
   tar_target(GOPlot.SEP1, PlotGO(GO_summary.SEP1,"biological_process","molecular_function","cellular_component")),  # Building and plotting main GO terms of each Namespace SEP1
   tar_target(ExportGO.SEP1, PlotExport("results/Annotation/figures/MainGOterms.SEP1.png", GOPlot.SEP1)),            #
 #####################################################################################################################
-#####################################################################################################################
+#########################################################################################################
+  tar_target(SumPlot.SEP1, SumAnnotation(FullAnnot.SEP1)),                                              # Scripts 10 & 2
+  tar_target(ExportSum.SEP1, PlotExport("results/Annotation/figures/SumAnnotation.SEP1.png", SumPlot.SEP1)), # Calculating & plotting the percentage of transsccripts that are annotated
+#########################################################################################################
+#########################################################################################################
 ###############################################################################################
 ################################### SEP1 & SEP2 ###############################################
 ###############################################################################################
-  tar_target(file9, "data/annotation/Trinity_rnasep1.Trinity95.fasta.transdecoder.gff3"),     #
-  tar_target(file10, "data/annotation/Trinity_rnasep2.Trinity95.fasta.transdecoder.gff3"),    #
-  tar_target(file11, "data/annotation/SEP1.SEP2.blastn.outfmt6"),                             #
-  tar_target(VennData, BuildVennData(file9,file10,file11)),                                   #
+  tar_target(file12, "data/annotation/Trinity_rnasep1.Trinity95.fasta.transdecoder.gff3"),    #
+  tar_target(file13, "data/annotation/Trinity_rnasep2.Trinity95.fasta.transdecoder.gff3"),    #
+  tar_target(file14, "data/annotation/SEP1.SEP2.blastn.outfmt6"),                             #
+  tar_target(VennData, BuildVennData(file12,file13,file14)),                                  #
   tar_target(Venn, displayVenn(VennData,                                                      #
                                category.names=c("SEP2", "SEP1"),                              #
                                lwd=2,                                                         #
@@ -137,6 +170,6 @@ list(
 
 # tar_visnetwork(physics=TRUE)
 
-# tar_make()
+# tar_make(report)
 
 # tar_read(Venn)
