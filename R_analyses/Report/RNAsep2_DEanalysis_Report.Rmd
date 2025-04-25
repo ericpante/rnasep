@@ -1,0 +1,54 @@
+---
+title: "RNAsep2 De analysis report"
+author: "Thomas Sol Dourdin"
+date: "2025-04-09"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# **Differential gene expression analysis using DESeq2**
+
+| The differential gene expression analysis was performed using the DESeq2 R package.
+
+| The three treated conditions: **Hg**, **CO2** and **Hg+CO2** were independently analysed against the control condition: **CT**, using the *Wald test* implemented in DESeq2 (pairwise comparison).
+The threshold used were : **pvalue < 0.05** & **|log2FoldChange| > 0.5**.
+
+| Regarding the **Hg** & **CO2** conditions, only few genes were differentially expressed : **5** and **15**, respectively. However, **315 DEGs** were found in the **Hg+CO2** condition, suggesting a synergistic interaction between both stressors when they occur concomitantly.  
+
+| As shown in the Venn diagram below, only one DEG was found to be common to all conditions but a substantial proportion of DEGs from **Hg** and **CO2** conditions were also affected by the **Hg+CO2** treatment (60% and 27%, respectively).
+
+
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+grid.newpage()
+venn_object <- tar_read(VennDiagram)
+grid.draw(venn_object)
+```
+
+
+| Among the 315 DEGs from the **Hg+CO2** condition, **61 were up-regulated** and **254 were down-regulated** (cf. heatmap).
+|
+|
+|
+
+```{r echo=FALSE, warning=FALSE, message=FALSE, fig.width=7, fig.height=6}
+tar_read(Heat1)
+```
+
+
+# **Function enrichment analysis using GOMWU**
+
+| Overall, 158 biological processes were found to be significantly enriched in the **Hg+CO2** condition. The more significants are represented below:
+|
+|
+|
+
+```{r echo=FALSE, warning=FALSE, message=FALSE, fig.width=8, fig.height=8}
+tar_read(HgCO2_BP_Plot)
+```
+
+| Noteworthy, among the main repressed GOterms are biological processes related to the defense of the organism (i.e. $*immune response*, *defense response*, *response to wounding*, *inflammatory response*, *protein activation cascade* etc.). A link to the alteration of anti-predatory behaviour may be done. Moreover, genes implicated in the development of musclar tissues (i.e. *muscle development* and *muscle cell differentiation*), along with the development of neuronal network (i.e. *defasciculation of motor neuron axon*, *axonal defasciculation*) are also repressed, corroborating behavioral evidences for the neurotixicity of the two stressors.
+
+| On the other side, there is a clear induction of RNA processing-related genes (*ribosome biogenesis*, *RNA splicing*, *mRNA processing*) as well as putative epigenetic regulation (*chromatin organization*, *obsolete histone H3-K4 methylation*, *obsolete covalent chromatin modification*) which may be characteristic of a response to environmental stress. Based on this, investigating epigenetic modifications would be  quite relevant. (**See also the growing literature on the topic**).
