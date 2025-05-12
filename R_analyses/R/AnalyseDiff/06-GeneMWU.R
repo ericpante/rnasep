@@ -7,34 +7,37 @@
 
 # Gene to GO list
 
-goMWU <- function(dds,  NAME, GO){
+goMWU <- function(dds,NAME,GO){
   
   Res <- results(dds, name=NAME) %>%
     data.frame() %>%
     rownames_to_column(var="ID") %>%
-    filter(pvalue != "NA")
+    dplyr::filter(pvalue != "NA")
   
   GO %>%
     data.frame() %>%
-    filter(GOs != "NA" & GOs != "-" & Transcript %in% Res$ID) %>%
-    select(Transcript, GOs) %>%
-    mutate(GOs=str_replace_all(GOs, ",", ";"))
+    dplyr::filter(GOs != "NA" & GOs != "-" & Transcript %in% Res$ID) %>%
+    dplyr::select(Transcript, GOs) %>%
+    dplyr::mutate(GOs=str_replace_all(GOs, ",", ";"))
   
   
 }
 
 # Complete list of analyzed genes
 
-geneMWU <- function(dds, NAME, Ref){
+geneMWU <- function(dds, NAME, THRESHOLD, Ref){
   
   Res <- results(dds, name=NAME) %>% # This objet contains all the genes influences by Treatment
     data.frame() %>%
     rownames_to_column(var="ID") %>%
     arrange(padj) %>%
-    filter(pvalue != "NA") %>%
-    select(ID, log2FoldChange) %>%
-    filter(ID %in% Ref$Transcript)
+    dplyr::filter(pvalue != "NA") %>%
+    dplyr::select(ID, log2FoldChange) %>%
+    dplyr::filter(ID %in% Ref$Transcript)
   
+}
+
+
 }
 
 

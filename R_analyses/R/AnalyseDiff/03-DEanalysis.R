@@ -19,10 +19,10 @@ RetrieveDEG <- function(dds,  NAME, THRESHOLD){
   
   Res %>% # This objet contains every genes influences Treatment
     data.frame() %>%
-    rownames_to_column(var="ID") %>%
-    arrange(padj) %>%
-    filter(padj<0.05,
-           abs(log2FoldChange) > THRESHOLD) %>%
+    tibble::rownames_to_column(var="ID") %>%
+    dplyr::arrange(padj) %>%
+    dplyr::filter(padj<0.05 &
+           abs(log2FoldChange) >0.5) %>%
     dplyr::select(ID, log2FoldChange)
   
 }

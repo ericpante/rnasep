@@ -153,9 +153,10 @@ list(
   tar_target(VennExport, PlotExport("results/Annotation/figures/Venn.SEP1.SEP2.png", Venn)),  #
 ###############################################################################################
 #######################################################################################
-  tar_render(report, path='Report/RNAsep2_Annotation_Report.Rmd')                     # Building a quick report
+  tar_render(report, path='Report/RNAsep2_Annotation_Report.Rmd'),                    # Building a quick report
 #######################################################################################
 #######################################################################################
+  tar_render(article, path='Report/Transcriptome_Announcement.Rmd')
   )
 
 #############################################
@@ -170,6 +171,6 @@ list(
 
 # tar_visnetwork(physics=TRUE)
 
-# tar_make(report)
+# tar_make(article)
 
 # tar_read(Venn)

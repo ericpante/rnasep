@@ -51,6 +51,8 @@ SumAnnotation <- function(Annotation){
   ggplot(AnnotationSummary, aes(x=reorder(Annot, Prop, decreasing = TRUE), y=Prop)) +
     geom_col(width=0.9, fill=wes_palette(n=6, name="BottleRocket1"), color="white") +
     coord_flip() +
+    theme(axis.title.x=element_text(size=9),
+          axis.title.y=element_text(size=9)) +
     theme_bw() +
     labs(y="Percentage of transcripts",
          x="Annotation type")

@@ -41,9 +41,9 @@ list(
 ##################################################################################################  
 ########################################## HgCO2 vs CT ###########################################
 ##################################################################################################
-  tar_target(file, "configFiles/Design_Deseq.tsv"),                                              # Script 1
+  tar_target(file, "configFiles/Design_Deseq1.tsv"),                                              # Script 1
   tar_target(meta, ReadMeta(file)),                                                              # Read and prepare SampleTable
-  tar_target(sampleTable1, tidyMeta(meta, "CT7.7", "Hg8.1")),                                    #
+  tar_target(sampleTable1, tidyMeta(meta, "CT8.1", "Hg7.7")),                                    #
 ##################################################################################################
 ##################################################################################################
   tar_target(directory, "data/analyseDiff"),                                                     # Script 2
@@ -51,7 +51,7 @@ list(
 ##################################################################################################
 ##################################################################################################
   tar_target(dds1, DEanalysis(star1, "Wald")),                                                   # Script3
-  tar_target(DEG1, RetrieveDEG(dds1, "Treatment_Hg8.1_vs_CT7.7", 0.5)),                          # Running DE analysis and retrieving DEGs
+  tar_target(DEG1, RetrieveDEG(dds1, "Treatment_Hg7.7_vs_CT8.1", 0.5)),                          # Running DE analysis and retrieving DEGs
 ##################################################################################################
 ##################################################################################################
   tar_target(Heat1, HeatDEG(dds1, DEG1, 2, 2, rows=FALSE)),                                      # Scripts 4 & 5  
@@ -62,21 +62,21 @@ list(
   tar_target(AnnotationFile, readRDS(FullAnnot)),                                                #
 ##################################################################################################
 ##################################################################################################
-  tar_target(GOforMWU1, goMWU(dds1, "Treatment_Hg8.1_vs_CT7.7", AnnotationFile)),                # 
-  tar_target(GENEforMWU1, geneMWU(dds1, "Treatment_Hg8.1_vs_CT7.7", GOforMWU1)),                 # Script 6
+  tar_target(GOforMWU1, goMWU(dds1, "Treatment_Hg7.7_vs_CT8.1", AnnotationFile)),                # 
+  tar_target(GENEforMWU1, geneMWU(dds1, "Treatment_Hg7.7_vs_CT8.1", 0.5, GOforMWU1)),            # Script 6
   tar_target(GOTable, ExportGO(GOforMWU1, "R/AnalyseDiff/GOMWU/GeneToGO.tab")),                  # Build & Export Go & Gene files to be used by GOMWU (external scripts, cf. https://github.com/z0on/GO_MWU)
   tar_target(GENEtable1, ExporteGENE(GENEforMWU1, "R/AnalyseDiff/GOMWU/GeneToValue.csv")),       #
 ##################################################################################################
 ########################################## Hg vs CT ##############################################
 ##################################################################################################
-  tar_target(sampleTable2, tidyMeta(meta, "CT7.7", "Hg7.7")),                                    #
+  tar_target(sampleTable2, tidyMeta(meta, "CT8.1", "Hg8.1")),                                    #
 ##################################################################################################
 ##################################################################################################
   tar_target(star2, BuildDESeq(ST=sampleTable2, DIR=directory)),                                 # 
 ##################################################################################################
 ##################################################################################################
   tar_target(dds2, DEanalysis(star2, "Wald")),                                                   # Script3
-  tar_target(DEG2, RetrieveDEG(dds2, "Treatment_Hg7.7_vs_CT7.7", 0.5)),                          # unning DE analysis and retrieving DEGs
+  tar_target(DEG2, RetrieveDEG(dds2, "Treatment_Hg8.1_vs_CT8.1", 0.5)),                          # unning DE analysis and retrieving DEGs
 ##################################################################################################
 ##################################################################################################
   tar_target(Heat2, HeatDEG(dds2, DEG2, 2, 2)),                                                  # Scripts 4 & 5
@@ -84,7 +84,7 @@ list(
 ################################################################################################## Too few DEGs so don't need to go further on functional enrichement analysis.
 ########################################## CO2 vs CT #############################################
 ##################################################################################################
-  tar_target(sampleTable3, tidyMeta(meta, "CT7.7", "CT8.1")),                                    #
+  tar_target(sampleTable3, tidyMeta(meta, "CT8.1", "CT7.7")),                                    #
 ##################################################################################################
 ##################################################################################################
   tar_target(star3, BuildDESeq(ST=sampleTable3, DIR=directory)),                                 # 
@@ -127,6 +127,6 @@ list(
 
 # tar_visnetwork(physics=TRUE)
 
-# tar_make(Report)
+# tar_make()
 
 # tar_read()

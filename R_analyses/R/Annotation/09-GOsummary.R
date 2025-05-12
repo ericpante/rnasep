@@ -25,24 +25,28 @@ summarizeGO <- function(data, go){
 # Plotting the top 20 GO annotated terms for BP, MF & CC in on wrap plot
 PlotGO <- function(data, NS1, NS2, NS3){
 
+  
   x <- data %>%
     filter(Namespace==NS1) %>%
     arrange(desc(n)) %>%
-    unite(GOterms, GOs,Name, sep="-")
+    tidyr::unite(GOterms, GOs,Name, sep="-") %>%
+    separate(GOterms, into=c("GO", "Description"), sep="- ")
   
   X <- x[2:21,]
   
   y <- data %>%
     filter(Namespace==NS2) %>%
     arrange(desc(n)) %>%
-    unite(GOterms, GOs,Name, sep="-")
+    unite(GOterms, GOs,Name, sep="-") %>%
+    separate(GOterms, into=c("GO", "Description"), sep="- ")
   
   Y <- y[2:21,]
   
   z <- data %>%
     filter(Namespace==NS3) %>%
     arrange(desc(n)) %>%
-    unite(GOterms, GOs,Name, sep="-")
+    unite(GOterms, GOs,Name, sep="-") %>%
+    separate(GOterms, into=c("GO", "Description"), sep="- ")
   
   Z <- z[2:21,]
   
@@ -51,13 +55,15 @@ PlotGO <- function(data, NS1, NS2, NS3){
     arrange(desc(n), .by_group=TRUE)
   
   Sum %>%
-    ggplot(aes(x=reorder(GOterms, n), y=n, fill=Namespace)) +
+    ggplot(aes(x=reorder(Description, n), y=n, fill=Namespace)) +
     geom_col() +
     facet_wrap(~Namespace, scales="free", ncol=1) +
     scale_fill_manual(values=wes_palette(n=3, name="GrandBudapest2")) +
     theme_bw() +
     theme(axis.text.y=element_text(size=6),
-          legend.position = "none") +
+          legend.position = "none",
+          axis.title.x=element_text(size=9),
+          axis.title.y=element_text(size=9)) +
     coord_flip() +
     labs(x="GO terms",
          y="Occurrences")
