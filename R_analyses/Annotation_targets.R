@@ -144,18 +144,18 @@ list(
   tar_target(VennData, BuildVennData(file12,file13,file14)),                                  #
   tar_target(Venn, displayVenn(VennData,                                                      #
                                category.names=c("One month old", "Newly hatched"),            #
-                               lwd=2.1,                                                         #
+                               lwd=2.1,                                                       #
                                lty=4,                                                         # Script 11
-                               margin=0.11,
+                               margin=0.11,                                       
                                fill=wes_palette(n=2, name="GrandBudapest2"),                  # Comparing ORF content from SEP1 & 2 assemblies
-                               cex=2.5,                                                        #
+                               cex=2.3,                                                        #
                                fontface="italic",                                             #
                                cat.cex=2,                                                    #
                                cat.fontface="bold",                                           #
                                cat.pos=c(-30,30),
                                cat.default.pos="outer",                                       #
                                cat.dist=c(0.08, 0.08))),                                      #
-  tar_target(VennExport, PlotExport("results/Annotation/figures/Venn.SEP1.SEP3.png", Venn)),  #
+  tar_target(VennExport, PlotExport("results/Annotation/figures/Venn.SEP1.SEP2.png", Venn)),  #
 ###############################################################################################
 #######################################################################################
   tar_render(report, path='Report/RNAsep2_Annotation_Report.Rmd'),                    # Building a quick report
@@ -176,7 +176,6 @@ list(
 
 # tar_visnetwork(physics=TRUE)
 
-# tar_make(Venn)
-# tar_make(VennExport)
+# tar_make(VennReport)
 
 # tar_read()

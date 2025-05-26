@@ -1,30 +1,42 @@
-###########################################################################
-#		RNAsep PROJECT - PRJEB88225 (not released yet)		###
-###########################################################################
+###################################################################################################
+												###
+# RNAsep PROJECTs  - PRJEB89715 (rnasep1) and PRJEB88225 (rnasep2) (not released yet)		###
+												###
+###################################################################################################
 
-Testing for transcriptomic effects of Hg x pCO2 on Sepia officinalis juveniles (head tissues).
+Testing for transcriptomic effects of Hg and or Ag and pCO2 on Sepia officinalis newly hatched (whole body) and one month old (head tissues) juveniles.
 
 This project is divided in two part : (i) *de novo* transcriptome assembly and annotation ; (ii) differential expression analysis.
 
-The assembly and annotation were performed on the IFB-Core cluster.
-
-The differential expression analysis was performed using R language. 
+Analyses were performed on both IBO-Core cluster and local machine (R langage).
 
 ##########################################################################
 ## A great attention is paid to the workflow reproducibility.
 
-Therefore, all the bioinformatics tools are given above with the version used and the folders and scripts are numbered based on their execution order.
+Therefore, all the bioinformatics tools are given above with the version used. The folders and scripts are numbered based on their execution order.
 Regarding R workflow, the *renv* package was used to ensure the portability of the project library.
 In addition, the *target* package was used for workflow management, so it is fully reproducible.
+
 To easily reproduce this R project, one just need to:
-1. download the whole R_analysis folder on its own machine;
+1. download the last release of the project;
 2. download the appropriate data in a folder called "data" located at the root of the project
 3. charging the project library with `renv::restore()`;
 4. run the *_targets.R scripts
 
 <img src="Workflow.png" width="600"/>
 
-#######################################################
+
+#########################################################################
+## The project was made as Open Science.
+
+All the raw data and transcriptome assemblies are available at E.N.A under the accession numbers:
+
+- PRJEB89715 (Newly hatched juveniles - rnasep1)
+- PRJEB88225 (One month old juveniles - rnasep2)
+
+The annotation files for rnasep1 and 2 are available at Zenodo under the DOI: 10.5281/zenodo.15462278
+
+#########################################################################
 ## Bioinformatic Tools and versions for data processing
 
 ### 1. Quality check:
@@ -58,6 +70,8 @@ cd-hit_v4.8.1
 -> Read content: STAR_v2.7.11a
 
 -> Various statistics: TransRate_v1.0.3
+
+-> Rarefaction analysis (only for raw assemblies): setk_v1.3	; Salmon_v1.10.2
 
 ### 5. Assembly annotation
 
