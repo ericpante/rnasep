@@ -13,7 +13,7 @@ library(tarchetypes)
 
 # Set target options:
 tar_option_set(
-  packages = c("dplyr","tidyr", "readxl", "readr", "ggplot2", "wesanderson", "data.table", "VennDiagram"))
+  packages = c("dplyr","tidyr", "readxl", "readr", "ggplot2", "wesanderson", "data.table", "VennDiagram", "cowplot"))
 
 # Run the R scripts in the R/ folder with your custom functions:
 tar_source("R/Annotation/01-Blast_Load_Summarize_Plot.R")
@@ -27,6 +27,7 @@ tar_source("R/Annotation/08-GO_Namespace_Correspondance.R")
 tar_source("R/Annotation/09-GOsummary.R")
 tar_source("R/Annotation/10-SumAnnotation.R")
 tar_source("R/Annotation/11-CompareAssembliesVenn.R")
+tar_source("R/Annotation/12-MergePlot.R")
 
 
 # Replace the target list below with your own:
@@ -135,22 +136,26 @@ list(
 ###############################################################################################
 ################################### SEP1 & SEP2 ###############################################
 ###############################################################################################
-  tar_target(file12, "data/annotation/Trinity_rnasep1.Trinity95.fasta.transdecoder.gff3"),    #
-  tar_target(file13, "data/annotation/Trinity_rnasep2.Trinity95.fasta.transdecoder.gff3"),    #
+  tar_target(MergeGOPlot, mergePlot(GOPlot.SEP1,GOPlot,NROW=1,LABELS=c("A", "B"))),           #
+  tar_target(MergeSumPlot, mergePlot(SumPlot.SEP1, SumPlot, NROW=2, LABELS=c("A", "B"))),     #
+  tar_target(file12, "data/annotation/Trinity_rnasep1.Trinity95.fasta.transdecoder.cds"),     #
+  tar_target(file13, "data/annotation/Trinity_rnasep2.Trinity95.fasta.transdecoder.cds"),     #
   tar_target(file14, "data/annotation/SEP1.SEP2.blastn.outfmt6"),                             #
   tar_target(VennData, BuildVennData(file12,file13,file14)),                                  #
   tar_target(Venn, displayVenn(VennData,                                                      #
-                               category.names=c("SEP2", "SEP1"),                              #
-                               lwd=2,                                                         #
+                               category.names=c("One month old", "Newly hatched"),            #
+                               lwd=2.1,                                                         #
                                lty=4,                                                         # Script 11
+                               margin=0.11,
                                fill=wes_palette(n=2, name="GrandBudapest2"),                  # Comparing ORF content from SEP1 & 2 assemblies
-                               cex=1.2,                                                       #
+                               cex=2.5,                                                        #
                                fontface="italic",                                             #
-                               cat.cex=1.3,                                                   #
+                               cat.cex=2,                                                    #
                                cat.fontface="bold",                                           #
+                               cat.pos=c(-30,30),
                                cat.default.pos="outer",                                       #
-                               cat.dist=c(0.02, 0.02))),                                      #
-  tar_target(VennExport, PlotExport("results/Annotation/figures/Venn.SEP1.SEP2.png", Venn)),  #
+                               cat.dist=c(0.08, 0.08))),                                      #
+  tar_target(VennExport, PlotExport("results/Annotation/figures/Venn.SEP1.SEP3.png", Venn)),  #
 ###############################################################################################
 #######################################################################################
   tar_render(report, path='Report/RNAsep2_Annotation_Report.Rmd'),                    # Building a quick report
@@ -171,6 +176,7 @@ list(
 
 # tar_visnetwork(physics=TRUE)
 
-# tar_make(article)
+# tar_make(Venn)
+# tar_make(VennExport)
 
-# tar_read(Venn)
+# tar_read()
