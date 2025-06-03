@@ -6,7 +6,7 @@
 #SBATCH -t 03:00:00
 #SBATCH --error=Quant_Array%j.err
 #SBATCH --output=Quant_Array%j.out
-#SBATCH --array=1-16
+#SBATCH --array=1-18
 
 #Purge unused modules
 module purge
