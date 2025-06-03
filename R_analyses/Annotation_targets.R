@@ -146,13 +146,13 @@ list(
                                category.names=c("One month old", "Newly hatched"),            #
                                lwd=2.1,                                                       #
                                lty=4,                                                         # Script 11
-                               margin=0.11,                                       
+                               margin=0.11,                                                   #
                                fill=wes_palette(n=2, name="GrandBudapest2"),                  # Comparing ORF content from SEP1 & 2 assemblies
-                               cex=2.3,                                                        #
+                               cex=2.3,                                                       #
                                fontface="italic",                                             #
-                               cat.cex=2,                                                    #
+                               cat.cex=2,                                                     #
                                cat.fontface="bold",                                           #
-                               cat.pos=c(-30,30),
+                               cat.pos=c(-30,30),                                             #
                                cat.default.pos="outer",                                       #
                                cat.dist=c(0.08, 0.08))),                                      #
   tar_target(VennExport, PlotExport("results/Annotation/figures/Venn.SEP1.SEP2.png", Venn)),  #
@@ -176,6 +176,6 @@ list(
 
 # tar_visnetwork(physics=TRUE)
 
-# tar_make(VennReport)
+# tar_make(article)
 
 # tar_read()
