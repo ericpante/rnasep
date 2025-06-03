@@ -71,7 +71,7 @@ cd-hit_v4.8.1
 
 -> Various statistics: TransRate_v1.0.3
 
--> Rarefaction analysis (only for raw assemblies): setk_v1.3	; Salmon_v1.10.2
+-> Rarefaction analysis (only for raw assemblies): seqtk_v1.3	; Salmon_v1.10.2
 
 ### 5. Assembly annotation
 
