@@ -19,3 +19,9 @@ tidyMeta <- function(meta,A,B){
   return(Meta)
 }
 
+tidyMeta2 <- function(meta){
+  rownames(meta) <- meta$SampleName
+  
+  return(meta)
+}
+

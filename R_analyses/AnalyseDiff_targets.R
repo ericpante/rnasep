@@ -12,7 +12,7 @@ library(visNetwork)
 
 # Set target options:
 tar_option_set(
-  packages = c("dplyr","tidyverse","DESeq2","ggplot2","pheatmap", "pcaExplorer", "RColorBrewer", "VennDiagram", "wesanderson") # Packages that your targets need for their tasks.
+  packages = c("dplyr","tidyverse","DESeq2","ggplot2","pheatmap", "pcaExplorer", "RColorBrewer", "VennDiagram", "wesanderson", "WGCNA") # Packages that your targets need for their tasks.
   # Pipelines that take a long time to run may benefit from
   # optional distributed computing. To use this capability
   # in tar_make(), supply a {crew} controller
@@ -34,6 +34,9 @@ tar_source("R/AnalyseDiff/05-PlotExport.R")
 tar_source("R/AnalyseDiff/06-GeneMWU.R")
 tar_source("R/AnalyseDiff/07-CompareDEG.R")
 tar_source("R/AnalyseDiff/08-PlotGOMWU.R")
+tar_source("R/AnalyseDiff/09-CoExpNetwork.R")
+tar_source("R/Analysediff/10-ModuleConstruction.R")
+tar_source("R/AnalyseDiff/11-MatchExtTraits.R")
 
 
 # Replace the target list below with your own:
@@ -118,6 +121,32 @@ list(
   tar_target(HgCO2_GOMWU_BP, loadGOMWU(file2)),
   tar_target(HgCO2_BP_Plot, PlotGOMWU(HgCO2_GOMWU_BP)),
   tar_target(ExportHgCO2_BP_Plot, PlotExport("results/AnalyseDiff/figures/HgCO2_BP.png", HgCO2_BP_Plot)),
+##################################################################################################
+############################################ WGCNA ###############################################
+  tar_target(meta2, tidyMeta2(meta)),
+  tar_target(star, BuildDESeq(ST=meta2, DIR=directory)),
+  tar_target(exp, StarToExp(star)),
+  tar_target(check, checkSamples(exp)),
+  tar_target(sampleTree, findOut(exp)),
+  tar_target(PlotTree, plotTree("results/AnalyseDiff/figures/SampleTree.png",sampleTree), format="file"),
+  tar_target(Exp, rmOut(sampleTree, exp)),
+  tar_target(spt, softThres(Exp)),
+  tar_target(R2, plotR2("results/AnalyseDiff/figures/R2.png", spt), format="file"),
+  tar_target(meanConnect, plotConnect("results/AnalyseDiff/figures/meanConnect.png", spt), format="file"),
+  tar_target(Adj, Adjacency(Exp, 8)),
+  tar_target(TOM.dissim,TOMdissim(Adj)),
+  tar_target(geneTree, TreeGene(TOM.dissim)),
+  tar_target(ME, BuildModules(geneTree, TOM.dissim)),
+  tar_target(ModuleColors, MEColors(ME)),
+  tar_target(ME.dissim, MEdissim(Exp,ModuleColors)),
+  tar_target(merged, mergeModules(Exp, ModuleColors)),
+  tar_target(mergedMEs, retrieveMergedME(merged)),
+  tar_target(mergeColors, retrieveMergedColors(obj=merged)),
+  tar_target(DendroColors, plotDendroColors(geneTree,ModuleColors,mergeColors,"results/AnalyseDiff/figures/dendroColors.png"), format="file"),
+  tar_target(file3, "data/analyseDiff/Other/ExternalTraits.csv"),
+  tar_target(ExtTraits, loadTraits(path=file3, SEP=";", DEC=",", Exp.Matrix=Exp)),
+  tar_target(CorrelationMatrix,ModTraitCor(Exp,mergedMEs,ExtTraits)),
+  tar_target(Matrix, plotcor(ExtTraits,mergedMEs,CorrelationMatrix,"results/AnalyseDiff/figures/Module-Traits-Correlation.png",12,10,"in",300), format="file"),
   tar_render(Report, path="Report/RNAsep2_DEanalysis_Report.Rmd")
 )
 
@@ -127,6 +156,6 @@ list(
 
 # tar_visnetwork(physics=TRUE)
 
-# tar_make()
+# tar_make(Matrix)
 
-# tar_read()
+# tar_read(meta2)

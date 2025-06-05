@@ -9,9 +9,8 @@ library(pheatmap)
 
 meta <- read.table("configFiles/Design_Deseq1.tsv", header = T, sep="\t")
 
-meta <- meta %>%
-  mutate(SampleName = paste(SampleName,"-",Treatment)) %>%
-  filter(Treatment == "CT8.1" | Treatment == "Hg7.7")
+meta <- meta #%>%
+  #filter(Treatment == "CT8.1" | Treatment == "Hg7.7")
 rownames(meta) <-  meta$SampleName
 
 View(meta)
@@ -38,11 +37,11 @@ exp <- assay(star) %>%
   t()
 View(exp)
 
-gsg <- goodSamplesGenes(exp)
+gsg <- goodSamplesGenes(tar_read(exp))
 summary(gsg)
 gsg$allOK
 
-sampleTree <- hclust(dist(exp), method="average")
+sampleTree <- hclust(dist(tar_read(exp)), method="average")
 par(cex=0.6);
 par(mar=c(0,4,2,0))
 plot(sampleTree, main="Sample clustering to detect outliers", sub="",
@@ -50,7 +49,7 @@ plot(sampleTree, main="Sample clustering to detect outliers", sub="",
 abline(h=700000, col="red")
 
 cut.sampleTree <- cutreeStatic(sampleTree, cutHeight=700000, minSize=10)
-exp <- exp[cut.sampleTree==1,]
+exp <- tar_read(exp)[cut.sampleTree==1,]
 
 spt <- pickSoftThreshold(exp)
 spt
@@ -123,68 +122,71 @@ plotDendroAndColors(geneTree, cbind(ModuleColors, mergedColors),
                     addGuide = TRUE, guideHang = 0.05,
                     main = "Gene dendrogram and module colors for original and merged modules")
 
+# External Trait Matching
+ExtTraits <- read.delim("data/analyseDiff/Other/ExternalTraits.csv", sep=";", dec=",")
+View(ExtTraits)
+
+
+datTraits <- ExtTraits %>%
+  filter(SampleName != "30") %>%
+  filter(SampleName %in% rownames(exp))
+rownames(datTraits)<- datTraits$SampleName
+datTraits <- datTraits[,-1]
 
 
 
 
+# Module-trait associations
+# Define numbers of genes and samples
+nGenes = ncol(exp)
+nSamples = nrow(exp)
+module.trait.correlation = cor(mergedMEs, datTraits, use = "p") #p for pearson correlation coefficient 
+module.trait.Pvalue = corPvalueStudent(module.trait.correlation, nSamples) #calculate the p-value associated with the correlation
 
-star_test <- DESeq(star)
-vsd <- vst(star_test)
+# Will display correlations and their p-values
+textMatrix = paste(signif(module.trait.correlation, 2), "\n(",
+                   signif(module.trait.Pvalue, 1), ")", sep = "");
+dim(textMatrix) = dim(module.trait.correlation)
+par(mar = c(6, 8.5, 3, 1))
+# Display the correlation values within a heatmap plot
+labeledHeatmap(Matrix = module.trait.correlation,
+               xLabels = names(datTraits),
+               yLabels = names(mergedMEs),
+               ySymbols = names(mergedMEs),
+               colorLabels = FALSE,
+               colors = blueWhiteRed(50),
+               textMatrix = textMatrix,
+               setStdMargins = FALSE,
+               cex.text = 0.4,
+               zlim = c(-1,1),
+               main = paste("Module-trait relationships"))
 
-pcaData <- plotPCA(vsd, intgroup=c("Treatment"), returnData=TRUE, ntop=300) # Performing PCA using the 1000 more variable genes
-percentVar <- round(100 * attr(pcaData, "percentVar"))
+# Define variable uniform containing the UniformScore column of datTrait
+uniform = as.data.frame(datTraits$UniformScore)
+names(uniform) = "uniform"
 
-ggplot(pcaData, aes(PC1, PC2, color=Treatment)) + # Plotting the PCA
-  geom_point(size=4) +
-  scale_color_manual(values=c("lightblue", "lightgreen")) +
-  xlab(paste0("PC1: ",percentVar[1],"% variance")) +
-  ylab(paste0("PC2: ",percentVar[2],"% variance")) +
-  theme(axis.title = element_text(size=8),
-        legend.title = element_text(size=8)) +
-  labs(color="Condition") +
-  coord_fixed() +
-  theme(text=element_text(size=8)) +
-  theme_bw()
+modNames = substring(names(mergedMEs), 3) #extract module names
 
+#Calculate the module membership and the associated p-values
+geneModuleMembership = as.data.frame(cor(exp[-25,], mergedMEs, use = "p"))
+MMPvalue = as.data.frame(corPvalueStudent(as.matrix(geneModuleMembership), nSamples))
+names(geneModuleMembership) = paste("MM", modNames, sep="")
+names(MMPvalue) = paste("p.MM", modNames, sep="")
 
+#Calculate the gene significance and associated p-values
+geneTraitSignificance = as.data.frame(cor(exp[-25,], uniform, use = "p"))
+GSPvalue = as.data.frame(corPvalueStudent(as.matrix(geneTraitSignificance), nSamples))
+names(geneTraitSignificance) = paste("GS.", names(uniform), sep="")
+names(GSPvalue) = paste("p.GS.", names(uniform), sep="")
+head(GSPvalue)
 
-dds <- DESeq(star, test="Wald")
-resultsNames(dds)
-resPed<-results(dds, name="Treatment_Hg8.1_vs_CT7.7")
-View(resPed)
-Diff_Hg <- resPed %>% # This objet contains every genes influences by pedigree
-  data.frame() %>%
-  rownames_to_column(var="ID") %>%
-  arrange(padj) %>%
-  filter(padj<0.05,
-         abs(log2FoldChange) > 0.5) %>%
-  dplyr::select(ID, log2FoldChange)
-View(Diff_Hg)
-dds[1:100,]
-
-
-vsd <- vst(dds)
-a <- assay(vsd) %>%
-  as.data.frame() %>%
-  rownames_to_column(var="ID") %>%
-  filter(ID %in% Diff_Hg$ID)
-
-rownames(a)=a$ID
-
-Matrix <- a %>%
-  dplyr::select(-ID)
-
-pheatmap((Matrix), # Modify parameters as convenience
-         cluster_cols=TRUE,
-         clustering_distance_rows = "correlation",
-         clustering_distance_cols = "euclidean",
-         cluster_rows=TRUE,
-         scale="row",
-         border_color = "grey",
-         cutree_rows = 1,
-         cutree_cols = 2,
-         drop_levels = TRUE,
-         legend=FALSE,
-         fontsize = 9,
-         cellwidth =20,
-         angle_col=45)
+par(mar=c(1,1,1,1))
+module = "plum3"
+column = match(module, modNames)
+moduleGenes = mergedColors==module
+verboseScatterplot(abs(geneModuleMembership[moduleGenes,column]),
+                   abs(geneTraitSignificance[moduleGenes,1]),
+                   xlab = paste("Module Membership in", module, "module"),
+                   ylab = "Gene significance for Uniform Score",
+                   main = paste("Module membership vs. gene significance\n"),
+                   cex.main = 1.2, cex.lab = 1.2, cex.axis = 1.2, col = module)

@@ -38,8 +38,6 @@ geneMWU <- function(dds, NAME, THRESHOLD, Ref){
 }
 
 
-}
-
 
 # Export Go table
 ExportGO <- function(X, FILE){
