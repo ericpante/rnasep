@@ -37,6 +37,7 @@ tar_source("R/AnalyseDiff/08-PlotGOMWU.R")
 tar_source("R/AnalyseDiff/09-CoExpNetwork.R")
 tar_source("R/Analysediff/10-ModuleConstruction.R")
 tar_source("R/AnalyseDiff/11-MatchExtTraits.R")
+tar_source("R/AnalyseDiff/12-RetrieveHubGenes.R")
 
 
 # Replace the target list below with your own:
@@ -116,38 +117,86 @@ list(
              cat.dist=c(0.03, 0.03, 0.03))),                                                     #
   tar_target(ExportVenn, PlotExport("results/AnalyseDiff/figures/VennDEGS.png", VennDiagram)),   #
 ################################################################################################## 
-##################################################################################################
-  tar_target(file2, "results/AnalyseDiff/files/HgCO2_BP_results_table.txt"),
-  tar_target(HgCO2_GOMWU_BP, loadGOMWU(file2)),
-  tar_target(HgCO2_BP_Plot, PlotGOMWU(HgCO2_GOMWU_BP)),
-  tar_target(ExportHgCO2_BP_Plot, PlotExport("results/AnalyseDiff/figures/HgCO2_BP.png", HgCO2_BP_Plot)),
-##################################################################################################
-############################################ WGCNA ###############################################
-  tar_target(meta2, tidyMeta2(meta)),
-  tar_target(star, BuildDESeq(ST=meta2, DIR=directory)),
-  tar_target(exp, StarToExp(star)),
-  tar_target(check, checkSamples(exp)),
-  tar_target(sampleTree, findOut(exp)),
-  tar_target(PlotTree, plotTree("results/AnalyseDiff/figures/SampleTree.png",sampleTree), format="file"),
-  tar_target(Exp, rmOut(sampleTree, exp)),
-  tar_target(spt, softThres(Exp)),
-  tar_target(R2, plotR2("results/AnalyseDiff/figures/R2.png", spt), format="file"),
-  tar_target(meanConnect, plotConnect("results/AnalyseDiff/figures/meanConnect.png", spt), format="file"),
-  tar_target(Adj, Adjacency(Exp, 8)),
-  tar_target(TOM.dissim,TOMdissim(Adj)),
-  tar_target(geneTree, TreeGene(TOM.dissim)),
-  tar_target(ME, BuildModules(geneTree, TOM.dissim)),
-  tar_target(ModuleColors, MEColors(ME)),
-  tar_target(ME.dissim, MEdissim(Exp,ModuleColors)),
-  tar_target(merged, mergeModules(Exp, ModuleColors)),
-  tar_target(mergedMEs, retrieveMergedME(merged)),
-  tar_target(mergeColors, retrieveMergedColors(obj=merged)),
-  tar_target(DendroColors, plotDendroColors(geneTree,ModuleColors,mergeColors,"results/AnalyseDiff/figures/dendroColors.png"), format="file"),
-  tar_target(file3, "data/analyseDiff/Other/ExternalTraits.csv"),
-  tar_target(ExtTraits, loadTraits(path=file3, SEP=";", DEC=",", Exp.Matrix=Exp)),
-  tar_target(CorrelationMatrix,ModTraitCor(Exp,mergedMEs,ExtTraits)),
-  tar_target(Matrix, plotcor(ExtTraits,mergedMEs,CorrelationMatrix,"results/AnalyseDiff/figures/Module-Traits-Correlation.png",12,10,"in",300), format="file"),
-  tar_render(Report, path="Report/RNAsep2_DEanalysis_Report.Rmd")
+###########################################################################################################
+  tar_target(file2, "results/AnalyseDiff/files/HgCO2_BP_results_table.txt"),                              #
+  tar_target(HgCO2_GOMWU_BP, loadGOMWU(file2)),                                                           # Script 08
+  tar_target(HgCO2_BP_Plot, PlotGOMWU(HgCO2_GOMWU_BP)),                                                   # Computing/Plotting GOMWU results
+  tar_target(ExportHgCO2_BP_Plot, PlotExport("results/AnalyseDiff/figures/HgCO2_BP.png", HgCO2_BP_Plot)), #
+#################################################################################################################################################################
+############################################ WGCNA ##############################################################################################################
+#################################################################################################################################################################
+  tar_target(meta2, tidyMeta2(meta)),                                                                                                                           #
+  tar_target(star, BuildDESeq(ST=meta2, DIR=directory)),                                                                                                        #
+  tar_target(exp, StarToExp(star)),                                                                                                                             #
+  tar_target(check, checkSamples(exp)),                                                                                                                         #
+  tar_target(sampleTree, findOut(exp)),                                                                                                                         # Script 09
+  tar_target(PlotTree, plotTree("results/AnalyseDiff/figures/SampleTree.png",sampleTree), format="file"),                                                       # Building coexpression network
+  tar_target(ExpOut, rmOut(sampleTree, exp)),                                                                                                                   #
+  tar_target(spt, softThres(ExpOut)),                                                                                                                           #
+  tar_target(R2, plotR2("results/AnalyseDiff/figures/R2.png", spt), format="file"),                                                                             #
+  tar_target(meanConnect, plotConnect("results/AnalyseDiff/figures/meanConnect.png", spt), format="file"),                                                      #
+  tar_target(Adj, Adjacency(ExpOut, 8)),                                                                                                                        # Adj is the weighted gene co-expression networks and contains 23,106 nodes (genes).
+#################################################################################################################################################################
+#################################################################################################################################################################
+  tar_target(TOM.dissim,TOMdissim(Adj)),                                                                                                                        #
+  tar_target(geneTree, TreeGene(TOM.dissim)),                                                                                                                   #
+  tar_target(ME, BuildModules(geneTree, TOM.dissim)),                                                                                                           #
+  tar_target(ModuleColors, MEColors(ME, Adj)),                                                                                                                  #
+  tar_target(ME.dissim, MEdissim(ExpOut,ModuleColors)),                                                                                                         # Script 10
+  tar_target(merged, mergeModules(ExpOut, ModuleColors)),                                                                                                       # Constructing Eigengene modules
+  tar_target(mergedMEs, retrieveMergedME(merged)),                                                                                                              #
+  tar_target(mergeColors, retrieveMergedColors(obj=merged, ModuleColors)),                                                                                      #
+  tar_target(DendroColors, plotDendroColors(geneTree,ModuleColors,mergeColors,"results/AnalyseDiff/figures/dendroColors.png"), format="file"),                  #
+#################################################################################################################################################################
+#################################################################################################################################################################
+  tar_target(file3, "data/analyseDiff/Other/ExternalTraits.csv"),                                                                                               #
+  tar_target(ExtTraits, loadTraits(path=file3, SEP=";", DEC=",", Exp.Matrix=ExpOut)),                                                                           # Script 11
+  tar_target(CorrelationMatrix, ModTraitCor(ExpOut,mergedMEs,ExtTraits)),                                                                                       # Matching eigengene modules and traits
+  tar_target(Matrix, plotcor(ExtTraits,mergedMEs,CorrelationMatrix,"results/AnalyseDiff/figures/Module-Traits-Correlation.png",12,10,"in",300), format="file"), #
+#################################################################################################################################################################
+#################################################################################################################################################################
+  tar_target(MMall, ModuleMembership(mergedMEs, ExpOut)),                                                                                                       # 
+  tar_target(HubGeneMaroon, HubGenes(mergeColors, "maroon", MMall, c("MMmaroon"), Variable=MMmaroon, Percent=0.99, AnnotationFile)),                            # Script 12
+  tar_target(HubGeneCoral2, HubGenes(mergeColors, "coral2", MMall, c("MMcoral2"), Variable=MMcoral2, Percent=0.95, AnnotationFile)),                            # Retrieving Hub Genes for each module eigengene of interest
+#################################################################################################################################################################
+#################################################################################################################################################################
+  tar_target(TOM_subMaroon, TOMsub(mergeColors, "maroon", TOM.dissim)),                                                                                         #
+  tar_target(exportMaroonCytoscape, ExportTOMtoCyto(TOM_subMaroon, AnnotationFile, "maroon", PATH1="results/analyseDiff/files/MaroonCytoscapeEdges.txt",        # Export TOM for maroon module
+                                                    PATH2="results/analyseDiff/files/MaroonCytoscapeNodes.txt", Colors=mergeColors, THRLD=0.21),format = "rds"),
+  tar_target(MaroonNodeAttr, NodAttr(mergeColors, AnnotationFile, MMall, "maroon", Vars=c("Gene", "MMmaroon"), PATH="results/analyseDiff/files/MaroonNodeAttributes.txt"), format = "rds"),
+#################################################################################################################################################################
+  tar_target(TOM_subCoral2, TOMsub(mergeColors, "coral2", TOM.dissim)),
+  tar_target(exportCoral2Cytoscape, ExportTOMtoCyto(TOM_subCoral2, AnnotationFile, "coral2", PATH1="results/analyseDiff/files/Coral2CytoscapeEdges.txt",
+                                                    PATH2="results/analyseDiff/files/Coral2CytoscapeNodes.txt", Colors=mergeColors, THRLD=0.1),format = "rds"),                     #
+  tar_target(Coral2NodeAttr, NodAttr(mergeColors, AnnotationFile, MMall, "coral2", Vars=c("Gene", "MMcoral2"), PATH="results/analyseDiff/files/Coral2NodeAttributes.txt"), format = "rds"),
+
+
+
+
+
+
+
+
+
+  tar_target(GSuniform, TraitSignificance(ExtTraits$UniformScore, ExpOut, R=0.5)),                                                                              # 
+  tar_target(MaroonUniformGenes, HubGenes(MMuniform, GSuniform, Module=c("Gene", "MMmaroon"), variable=MMmaroon)),                                              # Here: Module=maroon       #
+#################################################################################################################################################################                           #
+  tar_target(BlackUniformGenes, HubGenes(MMuniform, GSuniform, Module=c("Gene", "MMblack"), variable=MMblack)),                                                 # Here: Module=black        #
+#################################################################################################################################################################                           #
+  tar_target(Darkorange2UniformGenes, HubGenes(MMuniform, GSuniform, Module=c("Gene", "MMdarkorange2"), variable=MMdarkorange2)),                               # Here: Module=darkorange2  # 
+#################################################################################################################################################################                           # UNIFORMSCORE
+  tar_target(Bisque4UniformGenes, HubGenes(MMuniform, GSuniform, Module=c("Gene", "MMbisque4"), variable=MMbisque4)),                                           # Here: Module=bisque4      #
+#################################################################################################################################################################                           #
+  tar_target(SteelblueUniformGenes, HubGenes(MMuniform, GSuniform, Module=c("Gene", "MMsteelblue"), variable=MMsteelblue)),                                     # Here: Module=steelblue    #
+#################################################################################################################################################################                           #
+  tar_target(Plum3UniformGenes, HubGenes(MMuniform, GSuniform, Module=c("Gene", "MMplum3"), variable=MMplum3)),                                                 # Here: Module=plum3        #
+#################################################################################################################################################################
+  tar_target(MMbrightness, ModuleMembership(mergedMEs, ExpOut, cols=c("MMskyblue3", "MMcoral2","MMlightcoral"), R=0.8)),
+  tar_target(GSbrightness, TraitSignificance(ExtTraits$Brightness, ExpOut, R=04)),
+  tar_target(Skyblue3BrightnessGenes, HubGenes(MMbrightness, GSbrightness, Module=c("Gene", "MMskyblue3"), variable=MMskyblue3)),
+  tar_target(Coral2BrightnessGenes, HubGenes(MMbrightness, GSbrightness, Module=c("Gene", "MMcoral2"), variable=MMcoral2)),
+#################################################################################################################################################################
+  tar_render(Report, path="Report/RNAsep2_DEanalysis_Report.Rmd")                                                                                               #
 )
 
 # Sys.setenv(TAR_PROJECT="AnalyseDiff")
@@ -156,6 +205,6 @@ list(
 
 # tar_visnetwork(physics=TRUE)
 
-# tar_make(Matrix)
+# tar_make(exportCoral2Cytoscape)
 
-# tar_read(meta2)
+# tar_read(HubGeneCoral2)

@@ -139,7 +139,7 @@ datTraits <- datTraits[,-1]
 # Module-trait associations
 # Define numbers of genes and samples
 nGenes = ncol(exp)
-nSamples = nrow(exp)
+nSamples = nrow(tar_read(ExpOut))
 module.trait.correlation = cor(mergedMEs, datTraits, use = "p") #p for pearson correlation coefficient 
 module.trait.Pvalue = corPvalueStudent(module.trait.correlation, nSamples) #calculate the p-value associated with the correlation
 
@@ -162,31 +162,44 @@ labeledHeatmap(Matrix = module.trait.correlation,
                main = paste("Module-trait relationships"))
 
 # Define variable uniform containing the UniformScore column of datTrait
-uniform = as.data.frame(datTraits$UniformScore)
+uniform = as.data.frame(tar_read(ExtTraits)$UniformScore)
 names(uniform) = "uniform"
 
-modNames = substring(names(mergedMEs), 3) #extract module names
+modNames = substring(names(tar_read(mergedMEs)), 3) #extract module names
 
 #Calculate the module membership and the associated p-values
-geneModuleMembership = as.data.frame(cor(exp[-25,], mergedMEs, use = "p"))
+geneModuleMembership = as.data.frame(cor(tar_read(ExpOut), tar_read(mergedMEs), use = "p"))
 MMPvalue = as.data.frame(corPvalueStudent(as.matrix(geneModuleMembership), nSamples))
 names(geneModuleMembership) = paste("MM", modNames, sep="")
 names(MMPvalue) = paste("p.MM", modNames, sep="")
 
 #Calculate the gene significance and associated p-values
-geneTraitSignificance = as.data.frame(cor(exp[-25,], uniform, use = "p"))
+geneTraitSignificance = as.data.frame(cor(tar_read(Exp), uniform, use = "p"))
 GSPvalue = as.data.frame(corPvalueStudent(as.matrix(geneTraitSignificance), nSamples))
 names(geneTraitSignificance) = paste("GS.", names(uniform), sep="")
 names(GSPvalue) = paste("p.GS.", names(uniform), sep="")
 head(GSPvalue)
 
 par(mar=c(1,1,1,1))
-module = "plum3"
+module = "grey60"
 column = match(module, modNames)
-moduleGenes = mergedColors==module
+moduleGenes = tar_read(mergeColors)==module
 verboseScatterplot(abs(geneModuleMembership[moduleGenes,column]),
                    abs(geneTraitSignificance[moduleGenes,1]),
                    xlab = paste("Module Membership in", module, "module"),
                    ylab = "Gene significance for Uniform Score",
                    main = paste("Module membership vs. gene significance\n"),
                    cex.main = 1.2, cex.lab = 1.2, cex.axis = 1.2, col = module)
+
+
+# Now, for each module of interest, choose the genes with a MM higher than 0.8
+
+UniformHubGenes <- geneModuleMembership %>%
+  dplyr::select(MMmaroon) %>%
+  dplyr::filter(MMmaroon >= 0.8)
+
+
+
+tar_read(HubGeneMaroon) %>%
+  ggplot(aes(x=MMmaroon)) +
+  geom_histogram()
