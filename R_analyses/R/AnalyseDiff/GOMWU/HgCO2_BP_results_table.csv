@@ -1,0 +1,63 @@
+GOterms,pval,direction,color,Trend,Ratio,GeneNumber
+G protein-coupled opioid receptor signaling pathway,0.00118979084811414,0,#046C9A,Repressed,0.266666666666667,4
+obsolete histone H3-K4 methylation,0.0186759204715999,1,#E6A0C4,Induced,0.119565217391304,11
+chromatin organization,0.0113115859684564,1,#E6A0C4,Induced,0.132882882882883,177
+obsolete covalent chromatin modification,0.0154310200512529,1,#E6A0C4,Induced,0.141337386018237,93
+protein methylation,0.0175531675782451,1,#E6A0C4,Induced,0.136986301369863,40
+obsolete histone methylation,0.0151239252814522,1,#E6A0C4,Induced,0.13135593220339,31
+mRNA metabolic process,0.0155417947198022,1,#E6A0C4,Induced,0.11306765523633,122
+mRNA processing,0.000612473895868944,1,#FD6467,Induced,0.111757857974389,96
+RNA splicing, via transesterification reactions,0.000612473895868944,1,#FD6467,Induced,0.112436115843271,66
+RNA processing,7.9142308382253e-08,1,#FD6467,Induced,0.123099203475742,170
+ribonucleoprotein complex biogenesis,5.83600666075981e-07,1,#FD6467,Induced,0.119155354449472,79
+ribosome biogenesis,1.62479623901161e-06,1,#FD6467,Induced,0.10077519379845,39
+obsolete ncRNA processing,0.000334424367380248,1,#FD6467,Induced,0.130841121495327,70
+rRNA metabolic process,0.000366202382963944,1,#FD6467,Induced,0.088145896656535,29
+obsolete ncRNA metabolic process,0.000425507073612452,1,#FD6467,Induced,0.124,93
+mitotic recombination,0.0195870302367771,1,#E6A0C4,Induced,0.333333333333333,12
+obsolete DNA ligation involved in DNA repair,0.0182997243611539,1,#E6A0C4,Induced,0.428571428571429,6
+negative regulation of microtubule polymerization or depolymerization,0.0133937259445348,1,#E6A0C4,Induced,0.166666666666667,25
+negative regulation of reproductive process,0.000386057201624704,1,#FD6467,Induced,0.155172413793103,27
+obsolete negative regulation of multi-organism process,0.00118979084811414,1,#FD6467,Induced,0.15112540192926,47
+regulation of germ cell proliferation,0.000425507073612452,1,#FD6467,Induced,0.189873417721519,15
+epithelial fluid transport,0.0113115859684564,0,#3B9AB2,Repressed,0.355555555555556,16
+transepithelial transport,0.00559468974805377,0,#3B9AB2,Repressed,0.378787878787879,25
+monoatomic anion transport,0.00476185844997327,0,#046C9A,Repressed,0.214088397790055,155
+monoatomic anion transmembrane transport,0.0174789531059737,0,#3B9AB2,Repressed,0.244140625,125
+carbohydrate transmembrane transport,0.000199540363538595,0,#046C9A,Repressed,0.285714285714286,22
+carbohydrate transport,0.00191563886944119,0,#046C9A,Repressed,0.282828282828283,28
+hexose transmembrane transport,0.00559468974805377,0,#3B9AB2,Repressed,0.275862068965517,16
+copper ion import across plasma membrane,0.0183187718069897,0,#3B9AB2,Repressed,0.5,5
+cell-cell adhesion,0.0186759204715999,1,#E6A0C4,Induced,0.191646191646192,156
+cell-cell adhesion via plasma-membrane adhesion molecules,0.000186821912539519,1,#FD6467,Induced,0.191304347826087,110
+plasma membrane tubulation,0.00559468974805377,1,#E6A0C4,Induced,0.16,8
+protein localization to cell periphery,0.0186759204715999,1,#E6A0C4,Induced,0.169047619047619,71
+negative regulation of peptidase activity,0.0151239252814522,0,#3B9AB2,Repressed,0.248447204968944,80
+carbohydrate derivative metabolic process,0.00118979084811414,0,#046C9A,Repressed,0.19297124600639,302
+aminoglycan metabolic process,1.24821578415471e-05,0,#046C9A,Repressed,0.330645161290323,82
+glycosaminoglycan metabolic process,0.000561404618707547,0,#046C9A,Repressed,0.24025974025974,37
+glycoprotein metabolic process,0.0137044079451343,0,#3B9AB2,Repressed,0.180952380952381,76
+carbohydrate derivative biosynthetic process,0.0151239252814522,0,#3B9AB2,Repressed,0.183867141162515,155
+negative regulation of vasculature development,0.00577488591540237,0,#3B9AB2,Repressed,0.237837837837838,44
+regulation of vasculature development,0.00186844963043122,0,#046C9A,Repressed,0.200564971751412,71
+external encapsulating structure organization,0.000553046842419139,0,#046C9A,Repressed,0.211438474870017,122
+axonal defasciculation,0.000892296276825827,0,#046C9A,Repressed,0.176470588235294,9
+defasciculation of motor neuron axon,0.00758849505281442,0,#3B9AB2,Repressed,0.147058823529412,5
+inflammatory response,0.000612473895868944,0,#046C9A,Repressed,0.235142118863049,91
+defense response,0.000199540363538595,0,#046C9A,Repressed,0.197794117647059,269
+production of molecular mediator involved in inflammatory response,0.0154310200512529,0,#3B9AB2,Repressed,0.28,7
+arachidonate metabolite production involved in inflammatory response,0.0186759204715999,0,#3B9AB2,Repressed,0.555555555555556,5
+response to wounding,0.0121213216464815,0,#3B9AB2,Repressed,0.186700767263427,146
+positive regulation of keratinocyte proliferation,0.000561404618707547,0,#046C9A,Repressed,0.476190476190476,10
+keratinocyte differentiation,0.0100300540595122,0,#3B9AB2,Repressed,0.215827338129496,30
+keratinization,0.000186821912539519,0,#046C9A,Repressed,0.369565217391304,17
+macrophage activation,0.0137044079451343,0,#3B9AB2,Repressed,0.3,9
+protein activation cascade,0.0155417947198022,0,#3B9AB2,Repressed,0.340909090909091,15
+immune response,0.00238181527478054,0,#046C9A,Repressed,0.184328837508028,287
+hemolymph coagulation,0.00125877160124658,0,#046C9A,Repressed,0.545454545454545,12
+response to biotic stimulus,0.0195092677101409,0,#3B9AB2,Repressed,0.186605981794538,287
+defense response to symbiont,0.0151239252814522,0,#3B9AB2,Repressed,0.189679218967922,136
+ovulation from ovarian follicle,0.0186759204715999,0,#3B9AB2,Repressed,0.307692307692308,4
+Malpighian tubule tip cell differentiation,0.0121213216464815,0,#3B9AB2,Repressed,0.357142857142857,10
+muscle cell differentiation,0.0186759204715999,0,#3B9AB2,Repressed,0.156565656565657,124
+muscle structure development,0.00217209711482701,0,#046C9A,Repressed,0.164179104477612,220
