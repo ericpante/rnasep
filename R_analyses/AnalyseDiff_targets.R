@@ -12,7 +12,7 @@ library(visNetwork)
 
 # Set target options:
 tar_option_set(
-  packages = c("dplyr","tidyverse","DESeq2","ggplot2","pheatmap", "pcaExplorer", "RColorBrewer", "VennDiagram", "wesanderson", "WGCNA") # Packages that your targets need for their tasks.
+  packages = c("dplyr","tidyverse","DESeq2","ggplot2","pheatmap", "pcaExplorer", "RColorBrewer", "VennDiagram", "wesanderson", "WGCNA", "KOGMWU") # Packages that your targets need for their tasks.
   # Pipelines that take a long time to run may benefit from
   # optional distributed computing. To use this capability
   # in tar_make(), supply a {crew} controller
@@ -56,9 +56,10 @@ list(
 ##################################################################################################
   tar_target(dds1, DEanalysis(star1, "Wald")),                                                   # Script3
   tar_target(DEG1, RetrieveDEG(dds1, "Treatment_Hg7.7_vs_CT8.1", 0.5)),                          # Running DE analysis and retrieving DEGs
+  tar_target(DEG1annot, AnnotDE(DEG1, AnnotationFile)),
 ##################################################################################################
 ##################################################################################################
-  tar_target(Heat1, HeatDEG(dds1, DEG1, 2, 2, rows=FALSE)),                                      # Scripts 4 & 5  
+  tar_target(Heat1, HeatDEG(dds1, DEG1, AnnotationFile, 2, 2, rows=FALSE)),                      # Scripts 4 & 5  
   tar_target(ExportHeat1, PlotExport("results/Analysediff/figures/HgCO2_heatmap.png", Heat1)),   # Build & export heatmap of DEGs
 ##################################################################################################
 ##################################################################################################
@@ -80,10 +81,11 @@ list(
 ##################################################################################################
 ##################################################################################################
   tar_target(dds2, DEanalysis(star2, "Wald")),                                                   # Script3
-  tar_target(DEG2, RetrieveDEG(dds2, "Treatment_Hg8.1_vs_CT8.1", 0.5)),                          # unning DE analysis and retrieving DEGs
+  tar_target(DEG2, RetrieveDEG(dds2, "Treatment_Hg8.1_vs_CT8.1", 0.5)),                          # Running DE analysis and retrieving DEGs
+  tar_target(DEG2annot, AnnotDE(DEG2, AnnotationFile)),                                          #
 ##################################################################################################
 ##################################################################################################
-  tar_target(Heat2, HeatDEG(dds2, DEG2, 2, 2)),                                                  # Scripts 4 & 5
+  tar_target(Heat2, HeatDEG(dds2, DEG2, AnnotationFile, 2, 2)),                                  # Scripts 4 & 5
   tar_target(ExportHeat2, PlotExport("results/Analysediff/figures/Hg_heatmap.png", Heat2)),      # Build & export heatmap of DEGs
 ################################################################################################## Too few DEGs so don't need to go further on functional enrichement analysis.
 ########################################## CO2 vs CT #############################################
@@ -96,12 +98,14 @@ list(
 ##################################################################################################
   tar_target(dds3, DEanalysis(star3, "Wald")),                                                   # Script3
   tar_target(DEG3, RetrieveDEG(dds3, "Treatment_CT8.1_vs_CT7.7", 0.5)),                          # Running DE analysis and retrieving DEGs
+  tar_target(DEG3annot, AnnotDE(DEG3, AnnotationFile)), 
 ##################################################################################################
 ##################################################################################################
-  tar_target(Heat3, HeatDEG(dds3, DEG3, 2, 2)),                                                  # Scripts 4 & 5
+  tar_target(Heat3, HeatDEG(dds3, DEG3, AnnotationFile, 2, 2)),                                  # Scripts 4 & 5
   tar_target(ExportHeat3, PlotExport("results/Analysediff/figures/CO2_heatmap.png", Heat3)),     # Build & export heatmap of DEGs
 ################################################################################################## Too few DEGs so don't need to go further on functional enrichement analysis.
 ############################################# ALL ################################################
+  tar_target(SumDEGplot, SumDEG(DEG1, DEG2, DEG3)),
 ##################################################################################################
   tar_target(VennData, BuildVennData(DEG1,DEG2,DEG3)),                                           #
   tar_target(VennDiagram, displayVenn(VennData,                                                  #
@@ -154,28 +158,95 @@ list(
   tar_target(CorrelationMatrix, ModTraitCor(ExpOut,mergedMEs,ExtTraits)),                                                                                       # Matching eigengene modules and traits
   tar_target(Matrix, plotcor(ExtTraits,mergedMEs,CorrelationMatrix,"results/AnalyseDiff/figures/Module-Traits-Correlation.png",12,10,"in",300), format="file"), #
 #################################################################################################################################################################
-#################################################################################################################################################################
-  tar_target(MMall, ModuleMembership(mergedMEs, ExpOut)),                                                                                                       # 
-  tar_target(HubGeneMaroon, HubGenes(mergeColors, "maroon", MMall, c("MMmaroon"), Variable=MMmaroon, Percent=0.99, AnnotationFile)),                            # Script 12
-  tar_target(HubGeneCoral2, HubGenes(mergeColors, "coral2", MMall, c("MMcoral2"), Variable=MMcoral2, Percent=0.95, AnnotationFile)),                            # Retrieving Hub Genes for each module eigengene of interest
-#################################################################################################################################################################
-#################################################################################################################################################################
-  tar_target(TOM_subMaroon, TOMsub(mergeColors, "maroon", TOM.dissim)),                                                                                         #
-  tar_target(exportMaroonCytoscape, ExportTOMtoCyto(TOM_subMaroon, AnnotationFile, "maroon", PATH1="results/analyseDiff/files/MaroonCytoscapeEdges.txt",        # Export TOM for maroon module
-                                                    PATH2="results/analyseDiff/files/MaroonCytoscapeNodes.txt", Colors=mergeColors, THRLD=0.21),format = "rds"),
-  tar_target(MaroonNodeAttr, NodAttr(mergeColors, AnnotationFile, MMall, "maroon", Vars=c("Gene", "MMmaroon"), PATH="results/analyseDiff/files/MaroonNodeAttributes.txt"), format = "rds"),
-#################################################################################################################################################################
-  tar_target(TOM_subCoral2, TOMsub(mergeColors, "coral2", TOM.dissim)),
-  tar_target(exportCoral2Cytoscape, ExportTOMtoCyto(TOM_subCoral2, AnnotationFile, "coral2", PATH1="results/analyseDiff/files/Coral2CytoscapeEdges.txt",
-                                                    PATH2="results/analyseDiff/files/Coral2CytoscapeNodes.txt", Colors=mergeColors, THRLD=0.1),format = "rds"),                     #
-  tar_target(Coral2NodeAttr, NodAttr(mergeColors, AnnotationFile, MMall, "coral2", Vars=c("Gene", "MMcoral2"), PATH="results/analyseDiff/files/Coral2NodeAttributes.txt"), format = "rds"),
-
-
-
-
-
-
-
+#######################################################################################################################################################################################################
+  tar_target(MMall, ModuleMembership(mergedMEs, ExpOut)),                                                                                                                                             # 
+  tar_target(HubGeneMaroon, HubGenes(mergeColors, "maroon", MMall, c("MMmaroon"), Variable=MMmaroon, Percent=0.99, AnnotationFile)),                                                                  # Script 12
+  tar_target(HubGeneCoral2, HubGenes(mergeColors, "coral2", MMall, c("MMcoral2"), Variable=MMcoral2, Percent=0.95, AnnotationFile)),                                                                  # Retrieving Hub Genes for each module eigengene of interest
+  tar_target(HubGeneSteelblue, HubGenes(mergeColors, "steelblue", MMall, c("MMsteelblue"), Variable=MMsteelblue, Percent=0.95, AnnotationFile)),                                                      #
+  tar_target(HubGenePlum3, HubGenes(mergeColors, "plum3", MMall, c("MMplum3"), Variable=MMplum3, Percent=0.95, AnnotationFile)),                                                                      #
+  tar_target(HubGeneSkyblue3, HubGenes(mergeColors, "skyblue3", MMall, c("MMskyblue3"), Variable=MMskyblue3, Percent=0.95, AnnotationFile)),
+  tar_target(HubGeneLightcoral, HubGenes(mergeColors, "lightcoral", MMall, c("MMlightcoral"), Variable=MMlightcoral, Percent=0.95, AnnotationFile)),
+#######################################################################################################################################################################################################
+#######################################################################################################################################################################################################
+  tar_target(TOM_subMaroon, TOMsub(mergeColors, "maroon", TOM.dissim)),                                                                                                                               #
+  tar_target(exportMaroonCytoscape, ExportTOMtoCyto(TOM_subMaroon, AnnotationFile, "maroon", PATH1="results/analyseDiff/files/MaroonCytoscapeEdges.txt",                                              # Export TOM for maroon module
+                                                    PATH2="results/analyseDiff/files/MaroonCytoscapeNodes.txt", Colors=mergeColors, THRLD=0.21),format = "rds"),                                      #
+  tar_target(MaroonNodeAttr, NodAttr(mergeColors, AnnotationFile, MMall, "maroon", Vars=c("Gene", "MMmaroon"), PATH="results/analyseDiff/files/MaroonNodeAttributes.txt"), format = "rds"),           #
+#######################################################################################################################################################################################################
+  tar_target(TOM_subCoral2, TOMsub(mergeColors, "coral2", TOM.dissim)),                                                                                                                               #
+  tar_target(exportCoral2Cytoscape, ExportTOMtoCyto(TOM_subCoral2, AnnotationFile, "coral2", PATH1="results/analyseDiff/files/Coral2CytoscapeEdges.txt",                                              # Export TOM for coral2 module
+                                                    PATH2="results/analyseDiff/files/Coral2CytoscapeNodes.txt", Colors=mergeColors, THRLD=0.1),format = "rds"),                                       #
+  tar_target(Coral2NodeAttr, NodAttr(mergeColors, AnnotationFile, MMall, "coral2", Vars=c("Gene", "MMcoral2"), PATH="results/analyseDiff/files/Coral2NodeAttributes.txt"), format = "rds"),           #
+#######################################################################################################################################################################################################
+  tar_target(TOM_subPlum3, TOMsub(mergeColors, "plum3", TOM.dissim)),                                                                                                                                 #
+  tar_target(exportPlum3Cytoscape, ExportTOMtoCyto(TOM_subPlum3, AnnotationFile, "plum3", PATH1="results/analyseDiff/files/Plum3CytoscapeEdges.txt",                                                  # Export TOM for plum3 module
+                                                   PATH2="results/analyseDiff/files/Plum3CytoscapeNodes.txt", Colors=mergeColors, THRLD=0.1), format= "rds"),                                         #
+  tar_target(Plum3NodeAttr, NodAttr(mergeColors, AnnotationFile, MMall, "plum3", Vars=c("Gene", "MMplum3"), PATH="results/analyseDiff/files/Plum3NodeAttributes.txt"), format = "rds"),               #
+#########################################################################################################################################################################################################
+  tar_target(TOM_subSteelblue, TOMsub(mergeColors, "steelblue", TOM.dissim)),                                                                                                                           #
+  tar_target(exportSteelblueCytoscape, ExportTOMtoCyto(TOM_subSteelblue, AnnotationFile, "steelblue", PATH1="results/analyseDiff/files/SteelblueCytoscapeEdges.txt",                                    # Export TOM for steelblue module
+                                                 PATH2="results/analyseDiff/files/SteelblueCytoscapeNodes.txt", Colors=mergeColors, THRLD=0.2), format= "rds"),                                         #
+  tar_target(SteelblueNodeAttr, NodAttr(mergeColors, AnnotationFile, MMall, "steelblue", Vars=c("Gene", "MMsteelblue"), PATH="results/analyseDiff/files/SteelblueNodeAttributes.txt"), format = "rds"), #
+#########################################################################################################################################################################################################
+  tar_target(TOM_subSkyblue3, TOMsub(mergeColors, "skyblue3", TOM.dissim)),                                                                                                                             #
+  tar_target(exportSkyblue3Cytoscape, ExportTOMtoCyto(TOM_subSkyblue3, AnnotationFile, "skyblue3", PATH1="results/analyseDiff/files/WGCNA/Skyblue3CytoscapeEdges.txt",                                  # Export TOM for skyblue3 module
+                                                     PATH2="results/analyseDiff/files/WGCNA/Skyblue3CytoscapeNodes.txt", Colors=mergeColors, THRLD=0.15), format= "rds"),                               #
+  tar_target(Skyblue3NodeAttr, NodAttr(mergeColors, AnnotationFile, MMall, "skyblue3", Vars=c("Gene", "MMskyblue3"), PATH="results/analyseDiff/files/WGCNA/Skyblue3NodeAttributes.txt"), format = "rds"),#
+#########################################################################################################################################################################################################
+  tar_target(TOM_subLightcoral, TOMsub(mergeColors, "lightcoral", TOM.dissim)),                                                                                                                         #
+  tar_target(exportLightcoralCytoscape, ExportTOMtoCyto(TOM_subLightcoral, AnnotationFile, "lightcoral", PATH1="results/analyseDiff/files/WGCNA/LightcoralCytoscapeEdges.txt",                          # Export TOM for lightcoral module
+                                                    PATH2="results/analyseDiff/files/WGCNA/LightcoralCytoscapeNodes.txt", Colors=mergeColors, THRLD=0.15), format= "rds"),                              #
+  tar_target(LightcoralNodeAttr, NodAttr(mergeColors, AnnotationFile, MMall, "lightcoral", Vars=c("Gene", "MMlightcoral"), PATH="results/analyseDiff/files/WGCNA/LightcoralNodeAttributes.txt"), format = "rds"),#
+#########################################################################################################################################################################################################
+  tar_target(MaroonForMWU, moduleMWU(MMall, TOM_subMaroon, value="MMmaroon")),                                                                                                                          #
+  tar_target(MaroonGO, ModuleGO(AnnotationFile, MaroonForMWU)),                                                                                                                                         #
+  tar_target(MaroonGOTable, ExportGO(MaroonGO, "R/AnalyseDiff/GOMWU/MaroonGeneToGO.tab")),                                                                                                              #
+  tar_target(MaroonGENEtable, ExporteGENE(MaroonForMWU, "R/AnalyseDiff/GOMWU/MaroonGeneToValue.csv")),                                                                                                  #
+#########################################################################################################################################################################################################
+  tar_target(Coral2ForMWU, moduleMWU(MMall, TOM_subCoral2, value="MMcoral2")),                                                                                                                          #
+  tar_target(Coral2GO, ModuleGO(AnnotationFile, Coral2ForMWU)),                                                                                                                                         #
+  tar_target(Coral2GOTable, ExportGO(Coral2GO, "R/AnalyseDiff/GOMWU/Coral2GeneToGO.tab")),                                                                                                              #
+  tar_target(Coral2GENEtable, ExporteGENE(Coral2ForMWU, "R/AnalyseDiff/GOMWU/Coral2GeneToValue.csv")),                                                                                                  #
+#########################################################################################################################################################################################################
+  tar_target(SteelblueForMWU, moduleMWU(MMall, TOM_subSteelblue, value="MMsteelblue")),                                                                                                                 #
+  tar_target(SteelblueGO, ModuleGO(AnnotationFile, SteelblueForMWU)),                                                                                                                                   #
+  tar_target(SteelblueGOTable, ExportGO(SteelblueGO, "R/AnalyseDiff/GOMWU/SteelblueGeneToGO.tab")),                                                                                                     #
+  tar_target(SteelblueGENEtable, ExporteGENE(SteelblueForMWU, "R/AnalyseDiff/GOMWU/SteelblueGeneToValue.csv")),                                                                                         #
+#########################################################################################################################################################################################################
+  tar_target(Skyblue3ForMWU, moduleMWU(MMall, TOM_subSkyblue3, value="MMskyblue3")),                                                                                                                    #
+  tar_target(Skyblue3GO, ModuleGO(AnnotationFile, Skyblue3ForMWU)),                                                                                                                                     #
+  tar_target(Skyblue3GOTable, ExportGO(Skyblue3GO, "R/AnalyseDiff/GOMWU/Skyblue3GeneToGO.tab")),                                                                                                        #
+  tar_target(Skyblue3GENEtable, ExporteGENE(Skyblue3ForMWU, "R/AnalyseDiff/GOMWU/Skyblue3GeneToValue.csv")),                                                                                            #
+#########################################################################################################################################################################################################
+  tar_target(LightcoralForMWU, moduleMWU(MMall, TOM_subLightcoral, value="MMlightcoral")),                                                                                                              #
+  tar_target(LightcoralGO, ModuleGO(AnnotationFile, LightcoralForMWU)),                                                                                                                                 #
+  tar_target(LightcoralGOTable, ExportGO(LightcoralGO, "R/AnalyseDiff/GOMWU/LightcoralGeneToGO.tab")),                                                                                                  #
+  tar_target(LightcoralGENEtable, ExporteGENE(LightcoralForMWU, "R/AnalyseDiff/GOMWU/LightcoralGeneToValue.csv")),                                                                                      #
+#########################################################################################################################################################################################################
+  tar_target(file4, "results/AnalyseDiff/files/MaroonModule_BP_results_table.txt"),                                                                                                                     #
+  tar_target(Maroon_GOMWU_BP, loadGOMWU(file4)),                                                                                                                                                        # Script 08
+  tar_target(Maroon_BP_Plot, PlotGOMWU(Maroon_GOMWU_BP)),                                                                                                                                               # Computing/Plotting KOGMWU
+  tar_target(ExportMaroon_BP_Plot, PlotExport("results/AnalyseDiff/figures/Maroon_BP.png", Maroon_BP_Plot)),                                                                                            # Maroon
+#########################################################################################################################################################################################################
+  tar_target(file5, "results/AnalyseDiff/files/SteelblueModule_BP_results_table.txt"),                                                                                                                  #
+  tar_target(Steelblue_GOMWU_BP, loadGOMWU(file5)),                                                                                                                                                     # Script 08
+  tar_target(Steelblue_BP_Plot, PlotGOMWU(Steelblue_GOMWU_BP)),                                                                                                                                         # Computing/Plotting GOMWU results
+  tar_target(ExportSteelblue_BP_Plot, PlotExport("results/AnalyseDiff/figures/Steelblue_BP.png", Steelblue_BP_Plot)),                                                                                   # Steelblue
+#########################################################################################################################################################################################################
+  tar_target(file6, "results/AnalyseDiff/files/Skyblue3Module_BP_results_table.txt"),
+  tar_target(Skyblue3_GOMWU_BP, loadGOMWU(file6)),
+  tar_target(Skyblue3_BP_Plot, PlotGOMWU(Skyblue3_GOMWU_BP)),
+  tar_target(ExportSkyblue3_BP_Plot, PlotExport("results/AnalyseDiff/figures/Skyblue3_BP.png", Skyblue3_BP_Plot)),
+#########################################################################################################################################################################################################
+  tar_target(file7, "results/AnalyseDiff/files/LightcoralModule_BP_results_table.txt"),
+  tar_target(Lightcoral_GOMWU_BP, loadGOMWU(file7)),
+  tar_target(Lightcoral_BP_Plot, PlotGOMWU(Lightcoral_GOMWU_BP)),
+  tar_target(ExportLightcoral_BP_Plot, PlotExport("results/AnalyseDiff/figures/Lightcoral_BP.png", Lightcoral_BP_Plot)),
+#########################################################################################################################################################################################################
+  tar_target(file8, "results/AnalyseDiff/files/Coral2Module_BP_results_table.txt"),
+  tar_target(Coral2_GOMWU_BP, loadGOMWU(file8)),
+  tar_target(Coral2_BP_Plot, PlotGOMWU(Coral2_GOMWU_BP)),
+  tar_target(ExportCoral2_BP_Plot, PlotExport("results/AnalyseDiff/figures/Coral2_BP.png", Coral2_BP_Plot)),
 
 
   tar_target(GSuniform, TraitSignificance(ExtTraits$UniformScore, ExpOut, R=0.5)),                                                                              # 
@@ -196,7 +267,7 @@ list(
   tar_target(Skyblue3BrightnessGenes, HubGenes(MMbrightness, GSbrightness, Module=c("Gene", "MMskyblue3"), variable=MMskyblue3)),
   tar_target(Coral2BrightnessGenes, HubGenes(MMbrightness, GSbrightness, Module=c("Gene", "MMcoral2"), variable=MMcoral2)),
 #################################################################################################################################################################
-  tar_render(Report, path="Report/RNAsep2_DEanalysis_Report.Rmd")                                                                                               #
+  tar_render(Report, path="Report/RNAsep2_DEanalysis_Report2.Rmd")                                                                                               #
 )
 
 # Sys.setenv(TAR_PROJECT="AnalyseDiff")
@@ -205,6 +276,6 @@ list(
 
 # tar_visnetwork(physics=TRUE)
 
-# tar_make(exportCoral2Cytoscape)
+# tar_make(names=c("Lightcoral_GOMWU_BP", "Lightcoral_BP_Plot", "ExportLightcoral_BP_Plot"))
 
-# tar_read(HubGeneCoral2)
+# tar_read(DEG2)

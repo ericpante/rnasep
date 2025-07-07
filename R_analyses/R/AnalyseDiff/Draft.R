@@ -6,6 +6,7 @@ library(tidyr)
 library(dplyr)
 library(tibble)
 library(pheatmap)
+library(wesanderson)
 
 meta <- read.table("configFiles/Design_Deseq1.tsv", header = T, sep="\t")
 
@@ -69,9 +70,11 @@ plot(spt$fitIndices[,1], spt$fitIndices[,5],
 text(spt$fitIndices[,1], spt$fitIndices[,5], labels= spt$fitIndices[,1],col="red")
 abline(h=1, col="red")
 
-softPower <- 8
+softPower <- 10
 adjacency <- adjacency(exp, power=softPower)
 
+kTotal <- softConnectivity(tar_read(Exp), power = 8)
+hist(kTotal, breaks=50, main="Histogram of Gene Connectivity", xlab="Connectivity (k)")
 # Module Construction
 # Topological Overlap Matrix
 TOM <- TOMsimilarity(adjacency) # Similarity
@@ -203,3 +206,47 @@ UniformHubGenes <- geneModuleMembership %>%
 tar_read(HubGeneMaroon) %>%
   ggplot(aes(x=MMmaroon)) +
   geom_histogram()
+
+
+renv::install("KOGMWU")
+library(KOGMWU)
+
+gene2kog <- tar_read(KOGforMWU) %>%
+  as.data.frame() %>%
+  filter(Transcript %in% Modulegenes$ID)
+
+Modulegenes <- tar_read(MaroonforMWU1) %>%
+  as.data.frame()
+View(Modulegenes)
+gene_vector <- setNames(Modulegenes$Value, Modulegenes$ID)
+
+Maroon.lth<-kog.mwu(Modulegenes,gene2kog)
+View(Maroon.lth)
+
+kogtable.rna <- makeDeltaRanksTable(list("Maroon.lth"=Maroon.lth))
+kogtable.rna
+
+library(pheatmap)
+mat <- as.matrix(kogtable.rna)
+mat <- mat[complete.cases(mat),]
+summary(mat)
+
+pheatmap(mat,
+         #clustering_distance_cols="correlation",
+         treeheight_row=15,
+         treeheight_col=15,
+         border_color="white")
+
+plot(kogtable.rna$Maroon.lth)
+View(Maroon.lth)
+
+b <- read.delim("configFiles/KOG_class.txt") %>%
+  as.data.frame()
+
+
+A <- tar_read(DEG1)
+B <- tar_read(DEG2)
+C <- tar_read(DEG3)
+
+keep1 <- A %>%
+  filter( ID %in% C$ID)

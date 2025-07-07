@@ -9,7 +9,8 @@
 loadGOMWU <- function(file){
   
 res <- read.delim(file, sep="\t") %>%
-  data.frame()
+  data.frame() %>%
+  filter(pval <= 0.051)
 
   res$GOterms = factor(res$GOterms, levels = res$GOterms)
   

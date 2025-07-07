@@ -12,12 +12,15 @@ DESeqDataSetFromHTSeqCount(sampleTable = ST,
 }
 
 StarToExp <- function(STAR){
-  star <- estimateSizeFactors(STAR)
+  star <- STAR
+  star <- estimateSizeFactors(star)
   star <- estimateDispersions(star)
   
-  idx <- rowSums(counts(star,normalized=TRUE) >= 10 ) >= 1
-  star <- star[idx,]
+  #idx <- rowSums(counts(star,normalized=TRUE) >= 10 ) >= 1
+  #star <- star[idx,]
   
-  assay(star) %>%
+  vsd <- vst(star)
+  
+  assay(vsd) %>%
     t()
 }

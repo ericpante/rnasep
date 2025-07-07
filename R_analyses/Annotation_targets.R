@@ -80,7 +80,7 @@ list(
 #########################################################################################################
 #########################################################################################################
   tar_target(SumPlot, SumAnnotation(FullAnnot)),                                                        # Scripts 10 & 2
-  tar_target(ExportSum, PlotExport("results/Annotation/figures/SumAnnotation.png", SumPlot)),           # Calculating & plotting the percentage of transsccripts that are annotated
+  tar_target(ExportSum, PlotExport("results/Annotation/figures/SumAnnotation.png", SumPlot)),           # Calculating & plotting the percentage of transscripts that are annotated
 #########################################################################################################
 #########################################################################################################
 ######################################################################################################### 

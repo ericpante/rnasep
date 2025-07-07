@@ -17,14 +17,29 @@ RetrieveDEG <- function(dds,  NAME, THRESHOLD){
   
   Res <- results(dds, name=NAME)
   
-  Res %>% # This objet contains every genes influences Treatment
+  Results <- Res %>% # This objet contains every genes influences Treatment
     data.frame() %>%
-    tibble::rownames_to_column(var="ID") %>%
-    dplyr::arrange(padj) %>%
-    dplyr::filter(padj<0.05 &
+    rownames_to_column(var="ID") %>%
+    arrange(padj) %>%
+    filter(padj<0.05 &
            abs(log2FoldChange) >0.5) %>%
-    dplyr::select(ID, log2FoldChange)
+    select(ID, log2FoldChange)
   
+  
+  return(Results)
+}
+
+AnnotDE <- function(DEG, Annot){
+  
+  valid_mapping <- Annot[!is.na(Annot$ProteinCode) & Annot$ProteinCode != "-",]
+  transcript_to_preferred <- setNames(valid_mapping$ProteinCode, valid_mapping$Transcript)
+  
+  Res <- DEG
+  Res$ID <- ifelse(Res$ID %in% names(transcript_to_preferred),
+                       transcript_to_preferred[Res$ID],
+                       Res$ID)
+  
+  return(Res)
 }
 
   

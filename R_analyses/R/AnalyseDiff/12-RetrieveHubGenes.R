@@ -39,8 +39,8 @@ HubGenes <- function(Colors, Mod, MM, Module, Variable, Percent, Annot){
     filter(Gene %in% Col$Gene) %>%
     filter({{Variable}} >= quantile({{Variable}}, Percent, na.rm=TRUE))
   
-  valid_mapping <- Annot[!is.na(Annot$Preferred_name) & Annot$Preferred_name != "-",]
-  transcript_to_preferred <- setNames(valid_mapping$Preferred_name, valid_mapping$Transcript)
+  valid_mapping <- Annot[!is.na(Annot$ProteinCode) & Annot$ProteinCode != "-",]
+  transcript_to_preferred <- setNames(valid_mapping$ProteinCode, valid_mapping$Transcript)
   
   Hub$Gene <- ifelse(Hub$Gene %in% names(transcript_to_preferred),
                      transcript_to_preferred[Hub$Gene],
@@ -73,8 +73,8 @@ ExportTOMtoCyto <- function(TOMSUB, Annot, Mod, PATH1, PATH2, Colors, THRLD){
     rownames_to_column(var="Gene") %>%
     dplyr::filter(. == Mod)
   
-  valid_mapping <- Annot[!is.na(Annot$Preferred_name) & Annot$Preferred_name != "-",]
-  transcript_to_preferred <- setNames(valid_mapping$Preferred_name, valid_mapping$Transcript)
+  valid_mapping <- Annot[!is.na(Annot$ProteinCode) & Annot$ProteinCode != "-",]
+  transcript_to_preferred <- setNames(valid_mapping$ProteinCode, valid_mapping$Transcript)
   
 Col$Gene <- ifelse(Col$Gene %in% names(transcript_to_preferred),
                      transcript_to_preferred[Col$Gene],
@@ -113,8 +113,8 @@ NodAttr <- function(Colors, Annot, GMM, Mod, Vars, PATH){
   
   colnames(nodAttr) <- c("name", "kME", "Size")
 
-  valid_mapping <- Annot[!is.na(Annot$Preferred_name) & Annot$Preferred_name != "-",]
-  transcript_to_preferred <- setNames(valid_mapping$Preferred_name, valid_mapping$Transcript)
+  valid_mapping <- Annot[!is.na(Annot$ProteinCode) & Annot$ProteinCode != "-",]
+  transcript_to_preferred <- setNames(valid_mapping$ProteinCode, valid_mapping$Transcript)
   
   nodAttr$name <- ifelse(nodAttr$name %in% names(transcript_to_preferred),
                      transcript_to_preferred[nodAttr$name],
