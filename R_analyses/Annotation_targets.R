@@ -47,9 +47,15 @@ list(
   tar_target(ePlotP, PlotEvalue(ePropP)),                                               #
   tar_target(PlotP, PlotExport("results/Annotation/figures/BlastP.eValue.png",ePlotP)), #
 #########################################################################################
+  tar_target(mollusca.outfmt6, "data/annotation/rnasep2_Trinity95.blastp.mollusca.outfmt6"),
+  tar_target(mollusca.blastp, load_blast(mollusca.outfmt6)),
+#########################################################################################
   tar_target(X, Tidy_blast(blastx, blastp, filter_on=TRUE)),                            # Script 3
   tar_target(P, Tidy_blast(blastp, blastx, filter_on=FALSE)),                           # Tidying & merging blastx and blastp annotations 
-  tar_target(BlastAnnot, Blast_annot(X,P)),                                             #
+  tar_target(BlastAnnot, Blast_annot(X,P)),                                             # 
+  tar_target(FilteredBlast, Annot_filter(BlastAnnot, mollusca.blastp)),                 #
+  tar_target(M, Tidy_blast(mollusca.blastp, FilteredBlast, filter_on=FALSE)),           #
+  tar_target(BlastAnnotMollusca, Blast_annot(FilteredBlast, M)),                        #
 #########################################################################################
 #########################################################################################
   tar_target(file3,"data/annotation/rnasep2_Trinity95.emapper.annotations.xlsx"),       #
@@ -61,8 +67,8 @@ list(
   tar_target(EggnogAnnot, Eggnog_annot(EG.nt, EG)),                                     #
 #########################################################################################
 #########################################################################################################################
-  tar_target(FullAnnot, Full_annot(BlastAnnot,EggnogAnnot)),                                                            # Scripts 5 & 6
-  tar_target(FinalAnnot, FileExport(FullAnnot, "results/Annotation/files/rnasep2_Trinity95_FunctionalAnnotation.csv")), # Building & exporting full annotation file
+  tar_target(FullAnnot, Full_annot(BlastAnnotMollusca,EggnogAnnot)),                                                            # Scripts 5 & 6
+  tar_target(FinalAnnot, FileExport(FullAnnot, "results/Annotation/files/rnasep2_Trinity95_FunctionalAnnotationWithMollusca.csv")), # Building & exporting full annotation file
 #########################################################################################################################
 ###################################################################################################
   tar_target(file5, "data/annotation/REACTOME.csv"),                                              #
@@ -71,19 +77,19 @@ list(
   tar_target(PlotReactome, PlotReac(ReactomeTidy)),                                               #
   tar_target(ExportReactome, PlotExport("results/Annotation/figures/Reactome.png",PlotReactome)), #
 ###################################################################################################
-#########################################################################################################
-  tar_target(file6, "configFiles/go.obo.rtf"),                                                          #
-  tar_target(GOterms, extract_GO_terms_and_namespaces(file6)),                                          # Script 8 & 9
-  tar_target(GO_summary, summarizeGO(EggnogAnnot, GOterms)),                                            # Building and plotting main GO terms of each Namespace
-  tar_target(GOPlot, PlotGO(GO_summary,"biological_process","molecular_function","cellular_component")),#
-  tar_target(ExportGO, PlotExport("results/Annotation/figures/MainGOterms.png", GOPlot)),               #
-#########################################################################################################
-#########################################################################################################
-  tar_target(SumPlot, SumAnnotation(FullAnnot)),                                                        # Scripts 10 & 2
-  tar_target(ExportSum, PlotExport("results/Annotation/figures/SumAnnotation.png", SumPlot)),           # Calculating & plotting the percentage of transscripts that are annotated
-#########################################################################################################
-#########################################################################################################
-######################################################################################################### 
+###########################################################################################################
+  tar_target(file6, "configFiles/go.obo.rtf"),                                                            #
+  tar_target(GOterms, extract_GO_terms_and_namespaces(file6)),                                            # Script 8 & 9
+  tar_target(GO_summary, summarizeGO(EggnogAnnot, GOterms)),                                              # Building and plotting main GO terms of each Namespace
+  tar_target(GOPlot, PlotGO(GO_summary,"biological_process","molecular_function","cellular_component")),  #
+  tar_target(ExportGO, PlotExport("results/Annotation/figures/MainGOterms.png", GOPlot)),                 #
+###########################################################################################################
+###########################################################################################################
+  tar_target(SumPlot, SumAnnotation(FullAnnot)),                                                          # Scripts 10 & 2
+  tar_target(ExportSum, PlotExport("results/Annotation/figures/SumAnnotationWithMollusca.png", SumPlot)), # Calculating & plotting the percentage of transscripts that are annotated
+###########################################################################################################
+###########################################################################################################
+########################################################################################################### 
 ##################################### RNA SEP1 #########################################################
 ########################################################################################################
 ########################################################################################################

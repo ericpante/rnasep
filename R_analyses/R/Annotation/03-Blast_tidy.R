@@ -32,3 +32,11 @@ Blast_annot <- function(X,P){
         #   ProteinNameP=ProteinName.y)
   rbind(X,P)
 }
+
+# filter Blast Annotation, deleting transcripts present in other annotation file
+Annot_filter <- function(data, other){
+  data <- as.data.frame(data) %>%
+    filter(!Transcript %in% other[,1])
+  
+  return(data)
+}

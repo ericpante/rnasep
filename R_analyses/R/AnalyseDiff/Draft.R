@@ -34,25 +34,36 @@ star <- star[idx,]
 library(WGCNA)
 library(fastcluster)
 
-exp <- assay(star) %>%
+STAR <- tar_read(star)
+STAR <- estimateSizeFactors(STAR)
+vsd <- vst(star)
+
+
+
+
+exp <- assay(vsd) %>%
   t()
 View(exp)
 
-gsg <- goodSamplesGenes(tar_read(exp))
+geneVars <- apply(exp, 2, var)
+topGenes <- names(sort(geneVars, decreasing = TRUE)[1:10000])
+expFilt <- exp[, topGenes]
+
+gsg <- goodSamplesGenes(expFilt)
 summary(gsg)
 gsg$allOK
 
-sampleTree <- hclust(dist(tar_read(exp)), method="average")
+sampleTree <- hclust(dist(expFilt), method="average")
 par(cex=0.6);
 par(mar=c(0,4,2,0))
 plot(sampleTree, main="Sample clustering to detect outliers", sub="",
      xlab="", cex.lab=1.5, cex.axis=1.5, cex.main=2)
-abline(h=700000, col="red")
+abline(h=104, col="red")
 
-cut.sampleTree <- cutreeStatic(sampleTree, cutHeight=700000, minSize=10)
-exp <- tar_read(exp)[cut.sampleTree==1,]
+cut.sampleTree <- cutreeStatic(sampleTree, cutHeight=125, minSize=10)
+expFiltOut <- expFilt[cut.sampleTree==1,]
 
-spt <- pickSoftThreshold(exp)
+spt <- pickSoftThreshold(expFiltOut)
 spt
 # Plot R^2 values as a function of the soft thresholds
 par(mar=c(1,1,1,1))
@@ -70,41 +81,57 @@ plot(spt$fitIndices[,1], spt$fitIndices[,5],
 text(spt$fitIndices[,1], spt$fitIndices[,5], labels= spt$fitIndices[,1],col="red")
 abline(h=1, col="red")
 
-softPower <- 10
-adjacency <- adjacency(exp, power=softPower)
+softPower <- 8
 
-kTotal <- softConnectivity(tar_read(Exp), power = 8)
-hist(kTotal, breaks=50, main="Histogram of Gene Connectivity", xlab="Connectivity (k)")
+net <- blockwiseModules(
+  expFiltOut,
+  power = softPower,
+  TOMType = "signed",              # ou "unsigned" ou "signed hybrid"
+  minModuleSize = 30,              # taille min d’un module
+  reassignThreshold = 0,           # évite de reclasser les gènes
+  mergeCutHeight = 0.25,           # seuil de fusion des modules
+  numericLabels = FALSE,            # modules numérotés au lieu de couleurs
+  pamRespectsDendro = FALSE,       # améliore la détection de modules
+  saveTOMs = TRUE,
+  verbose = 3
+)
+
+#adjacency <- adjacency(expFiltOut, power=softPower)
+
+#kTotal <- softConnectivity(exp, power = softPower)
+#hist(kTotal, breaks=50, main="Histogram of Gene Connectivity", xlab="Connectivity (k)")
 # Module Construction
 # Topological Overlap Matrix
-TOM <- TOMsimilarity(adjacency) # Similarity
-TOM.dissimilarity <- 1-TOM # Dissimilarity
+#TOM <- TOMsimilarity(adjacency) # Similarity
+#TOM.dissimilarity <- 1-TOM # Dissimilarity
 
 # Hierarchical Clustering Analysis
-geneTree <- hclust(as.dist(TOM.dissimilarity), method="average")
+#geneTree <- hclust(as.dist(TOM.dissimilarity), method="average")
 
-sizeGrWindow(12,9)
-plot(geneTree, xlab="", sub="", main = "Gene clustering on TOM-based dissimilarity", 
-     labels = FALSE, hang = 0.04)
+#sizeGrWindow(12,9)
+#plot(geneTree, xlab="", sub="", main = "Gene clustering on TOM-based dissimilarity", 
+#     labels = FALSE, hang = 0.04)
 
-Modules <- cutreeDynamic(dendro=geneTree, distM=TOM.dissimilarity, deepSplit = 2, pamRespectsDendro = FALSE, minClusterSize = 30)
+#Modules <- cutreeDynamic(dendro=geneTree, distM=TOM.dissimilarity, deepSplit = 2, pamRespectsDendro = FALSE, minClusterSize = 30)
 
-ModuleColors <- labels2colors(Modules) #assigns each module number a color
+ModuleColors <- labels2colors(tar_read(net)$colors)#assigns each module number a color
+names(ModuleColors) <- colnames(tar_read(ExpFiltOut))
+
 table(ModuleColors) #returns the counts for each color (aka the number of genes within each module)
 
 #plots the gene dendrogram with the module colors
-plotDendroAndColors(geneTree, ModuleColors,"Module",
+plotDendroAndColors(net$dendrograms[[1]], ModuleColors[net$blockGenes[[1]]],"Module",
                     dendroLabels = FALSE, hang = 0.03,
                     addGuide = TRUE, guideHang = 0.05,
                     main = "Gene dendrogram and module colors")
 
 # Module Eigengene Identification
-MElist <- moduleEigengenes(exp, colors = ModuleColors)
+MElist <- moduleEigengenes(expFiltOut, colors = ModuleColors)
 MEs <- MElist$eigengenes
 head(MEs)
 
 # Module Merging
-ME.dissimilarity = 1-cor(MElist$eigengenes, use="complete") #Calculate eigengene dissimilarity
+ME.dissimilarity = 1-cor(MEs, use="complete") #Calculate eigengene dissimilarity
 
 METree = hclust(as.dist(ME.dissimilarity), method = "average") #Clustering eigengenes 
 par(mar = c(0,4,2,0)) #seting margin sizes
@@ -112,14 +139,14 @@ par(cex = 0.6);#scaling the graphic
 plot(METree)
 abline(h=.25, col = "red") #a height of .25 corresponds to correlation of .75
 
-merge <- mergeCloseModules(exp, ModuleColors, cutHeight = .25)
+merge <- mergeCloseModules(expFiltOut, ModuleColors, cutHeight = .25)
 
 # The merged module colors, assigning one color to each module
 mergedColors = merge$colors
 # Eigengenes of the new merged modules
 mergedMEs = merge$newMEs
 
-plotDendroAndColors(geneTree, cbind(ModuleColors, mergedColors), 
+plotDendroAndColors(net$dendrograms[[1]], cbind(ModuleColors[net$blockGenes[[1]]], mergedColors[net$blockGenes[[1]]]), 
                     c("Original Module", "Merged Module"),
                     dendroLabels = FALSE, hang = 0.03,
                     addGuide = TRUE, guideHang = 0.05,
@@ -131,8 +158,7 @@ View(ExtTraits)
 
 
 datTraits <- ExtTraits %>%
-  filter(SampleName != "30") %>%
-  filter(SampleName %in% rownames(exp))
+  filter(SampleName %in% rownames(expFiltOut))
 rownames(datTraits)<- datTraits$SampleName
 datTraits <- datTraits[,-1]
 
@@ -141,8 +167,8 @@ datTraits <- datTraits[,-1]
 
 # Module-trait associations
 # Define numbers of genes and samples
-nGenes = ncol(exp)
-nSamples = nrow(tar_read(ExpOut))
+nGenes = ncol(expFiltOut)
+nSamples = nrow(expFiltOut)
 module.trait.correlation = cor(mergedMEs, datTraits, use = "p") #p for pearson correlation coefficient 
 module.trait.Pvalue = corPvalueStudent(module.trait.correlation, nSamples) #calculate the p-value associated with the correlation
 
@@ -160,7 +186,7 @@ labeledHeatmap(Matrix = module.trait.correlation,
                colors = blueWhiteRed(50),
                textMatrix = textMatrix,
                setStdMargins = FALSE,
-               cex.text = 0.4,
+               cex.text = 0.6,
                zlim = c(-1,1),
                main = paste("Module-trait relationships"))
 
@@ -244,9 +270,55 @@ b <- read.delim("configFiles/KOG_class.txt") %>%
   as.data.frame()
 
 
-A <- tar_read(DEG1)
-B <- tar_read(DEG2)
-C <- tar_read(DEG3)
+load("blockwiseTOM-block.1.RData")
 
-keep1 <- A %>%
-  filter( ID %in% C$ID)
+TOMmat <- as.matrix(TOM)
+
+colnames(TOMmat) <- geneNames
+rownames(TOMmat) <- geneNames
+
+module <- "blue"
+blockGenes <- tar_read(net)$blockGenes[[1]]
+geneNames <- colnames(tar_read(ExpFiltOut))[blockGenes]
+
+moduleColorsBlock <- labels2colors(tar_read(net)$colors[blockGenes])
+names(moduleColorsBlock) <- geneNames
+
+moduleGenes <- geneNames[moduleColorsBlock == module]
+
+moduleIndices <- which(geneNames %in% moduleGenes)
+TOM_module <- TOM[moduleIndices, moduleIndices]
+
+
+# Récuprérer noms de gènes d'un module donné
+
+Annot <- tar_read(AnnotationFile)
+a <- tar_read(mergeColors) %>%
+  as.data.frame() %>%
+  tibble::rownames_to_column(var="Gene") %>%
+  dplyr::filter(. == "blue")
+
+valid_mapping <- Annot[!is.na(Annot$ProteinCode) & Annot$ProteinCode != "-",]
+transcript_to_preferred <- setNames(valid_mapping$ProteinCode, valid_mapping$Transcript)
+
+a$Gene <- ifelse(a$Gene %in% names(transcript_to_preferred),
+                       transcript_to_preferred[a$Gene],
+                 a$Gene)
+
+
+
+A <- a %>%
+  filter(Gene %in% Annot$ProteinCode) %>%
+  select(Gene)
+
+
+b <- tar_read(mergeColors)
+moduleGenes <- names(b)[b == "blue"]
+
+file <- read.delim("mRNA_only.rnasep1.gff3", header=FALSE)
+
+A <- as.data.frame(sub(".*ID=([^~]+);.*", "\\1", file$V9))
+write.table(A, file="mRNA.lst", col.names = FALSE, row.names = FALSE, quote = FALSE)
+
+
+View(tar_read(dds1))
