@@ -322,3 +322,32 @@ write.table(A, file="mRNA.lst", col.names = FALSE, row.names = FALSE, quote = FA
 
 
 View(tar_read(dds1))
+
+
+
+
+Colors <- tar_read(mergeColors)
+Annot <- tar_read(AnnotationFile)
+
+
+Col <- Colors %>%
+  as.data.frame() %>%
+  rownames_to_column(var = "Gene") %>%
+  dplyr::filter(. == "tan")
+
+valid_mapping <- Annot[!is.na(Annot$ProteinCode) & Annot$ProteinCode != "-", ]
+transcript_to_preferred <- setNames(valid_mapping$ProteinCode, valid_mapping$Transcript)
+
+Col$Gene <- ifelse(Col$Gene %in% names(transcript_to_preferred),
+                   transcript_to_preferred[Col$Gene],
+                   Col$Gene
+)
+
+selected_genes <- Col[, 1]
+colnames(Col) <- c("Gene", "Module")
+
+ColData <- setNames(Col$Module, Col$Gene)
+
+View(Col)
+
+write.csv(Col, file="results/AnalyseDiff/files/TanModuleGenes.csv", quote=FALSE, row.names = FALSE)

@@ -18,8 +18,8 @@
 
 
 # Edit these to match your data file names: 
-input="YellowGeneToValue.csv" # two columns of comma-separated values: gene id, continuous measure of significance. To perform standard GO enrichment analysis based on Fisher's exact test, use binary measure (0 or 1, i.e., either sgnificant or not).
-goAnnotations="YellowGeneToGO.tab" # two-column, tab-delimited, one line per gene, multiple GO terms separated by semicolon. If you have multiple lines per gene, use nrify_GOtable.pl prior to running this script.
+input="TanGeneToValue.csv" # two columns of comma-separated values: gene id, continuous measure of significance. To perform standard GO enrichment analysis based on Fisher's exact test, use binary measure (0 or 1, i.e., either sgnificant or not).
+goAnnotations="TanGeneToGO.tab" # two-column, tab-delimited, one line per gene, multiple GO terms separated by semicolon. If you have multiple lines per gene, use nrify_GOtable.pl prior to running this script.
 goDatabase="go.obo" # download from http://www.geneontology.org/GO.downloads.ontology.shtml
 goDivision="BP" # either MF, or BP, or CC
 source("gomwu.functions.R")
@@ -89,7 +89,7 @@ for (ci in unique(ct)) {
 mwus=read.table(paste("MWU",goDivision,input,sep="_"),header=T)
 bestGOs=mwus[mwus$name %in% annots,]
 View(bestGOs)
-
+nrow(bestGOs)
 
 ### To produce a customized results dataframe.
 library(tidyverse)
@@ -124,7 +124,7 @@ res$GeneNumber = separated_ratio$A
 
 res <- res %>%
   filter(GOterms %in% bestGOs$name)
-write.table(res, "~/Documents/Recherche/rnasep/R_analyses/results/AnalyseDiff/files/Midnightblue_BP_results_table.txt", quote = FALSE, row.names = FALSE, col.names = TRUE, sep="\t")
+write.table(res, "~/Documents/Recherche/rnasep/R_analyses/results/AnalyseDiff/files/Tan_BP_results_rep_table.txt", quote = FALSE, row.names = FALSE, col.names = TRUE, sep="\t")
 
 res %>%
   ggplot(aes(Trend, GOterms, color=pval, size=GeneNumber)) +

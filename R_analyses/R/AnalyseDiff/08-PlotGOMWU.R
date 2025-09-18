@@ -23,7 +23,8 @@ PlotGOMWU <- function(data) {
     ggplot(aes(Trend, GOterms, color = pval, size = GeneNumber)) +
     geom_point() +
     theme_bw() +
-    theme(axis.text.x = element_text(size = 6)) +
+    theme(axis.text.x = element_text(size = 6),
+          axis.text.y = element_text(size=10)) +
     scale_color_gradient(low = "#E6A0C4", high = "#1E1E1E") +
     labs(
       x = "",
