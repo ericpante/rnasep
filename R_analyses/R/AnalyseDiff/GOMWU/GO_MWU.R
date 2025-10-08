@@ -18,8 +18,8 @@
 
 
 # Edit these to match your data file names: 
-input="TanGeneToValue.csv" # two columns of comma-separated values: gene id, continuous measure of significance. To perform standard GO enrichment analysis based on Fisher's exact test, use binary measure (0 or 1, i.e., either sgnificant or not).
-goAnnotations="TanGeneToGO.tab" # two-column, tab-delimited, one line per gene, multiple GO terms separated by semicolon. If you have multiple lines per gene, use nrify_GOtable.pl prior to running this script.
+input="GeneIntToValue.csv" # two columns of comma-separated values: gene id, continuous measure of significance. To perform standard GO enrichment analysis based on Fisher's exact test, use binary measure (0 or 1, i.e., either sgnificant or not).
+goAnnotations="GeneIntToGO.tab" # two-column, tab-delimited, one line per gene, multiple GO terms separated by semicolon. If you have multiple lines per gene, use nrify_GOtable.pl prior to running this script.
 goDatabase="go.obo" # download from http://www.geneontology.org/GO.downloads.ontology.shtml
 goDivision="BP" # either MF, or BP, or CC
 source("gomwu.functions.R")
@@ -34,7 +34,7 @@ gomwuStats(input, goDatabase, goAnnotations, goDivision,
 	smallest=5,   # a GO category should contain at least this many genes to be considered
 	clusterCutHeight=0.25, # threshold for merging similar (gene-sharing) terms. See README for details.
 #	Alternative="g" # by default the MWU test is two-tailed; specify "g" or "l" of you want to test for "greater" or "less" instead. 
-	Module=TRUE,Alternative="g" # un-remark this if you are analyzing a SIGNED WGCNA module (values: 0 for not in module genes, kME for in-module genes). In the call to gomwuPlot below, specify absValue=0.001 (count number of "good genes" that fall into the module)
+#	Module=TRUE,Alternative="g" # un-remark this if you are analyzing a SIGNED WGCNA module (values: 0 for not in module genes, kME for in-module genes). In the call to gomwuPlot below, specify absValue=0.001 (count number of "good genes" that fall into the module)
 #	Module=TRUE # un-remark this if you are analyzing an UNSIGNED WGCNA module 
 )
 # do not continue if the printout shows that no GO terms pass 10% FDR.
@@ -44,8 +44,8 @@ gomwuStats(input, goDatabase, goAnnotations, goDivision,
 
 #png("HgCO2_CC.png", width=9, height=10, units="in", res=300)
 results=gomwuPlot(input,goAnnotations,goDivision,
-          absValue=0.001,  # genes with the measure value exceeding this will be counted as "good genes". This setting is for signed log-pvalues. Specify absValue=0.001 if you are doing Fisher's exact test for standard GO enrichment or analyzing a WGCNA module (all non-zero genes = "good genes").
-          #absValue=1, # un-remark this if you are using log2-fold changes
+          #absValue=0.001,  # genes with the measure value exceeding this will be counted as "good genes". This setting is for signed log-pvalues. Specify absValue=0.001 if you are doing Fisher's exact test for standard GO enrichment or analyzing a WGCNA module (all non-zero genes = "good genes").
+          absValue=1, # un-remark this if you are using log2-fold changes
           level1=0.05, # FDR threshold for plotting. Specify level1=1 to plot all GO categories containing genes exceeding the absValue.
           level2=0.01, # FDR cutoff to print in regular (not italic) font.
           level3=0.001, # FDR cutoff to print in large bold font.
@@ -124,11 +124,10 @@ res$GeneNumber = separated_ratio$A
 
 res <- res %>%
   filter(GOterms %in% bestGOs$name)
-write.table(res, "~/Documents/Recherche/rnasep/R_analyses/results/AnalyseDiff/files/Tan_BP_results_rep_table.txt", quote = FALSE, row.names = FALSE, col.names = TRUE, sep="\t")
+write.table(res, "~/Documents/Recherche/Current/rnasep/R_analyses/results/AnalyseDiff/files/HgCO2_BP_results_rep_table.txt", quote = FALSE, row.names = FALSE, col.names = TRUE, sep="\t")
 
 res %>%
   ggplot(aes(Trend, GOterms, color=pval, size=GeneNumber)) +
   geom_point() +
   theme_bw() +
   scale_color_gradient(low="#E6A0C4", high= "#1E1E1E")
-

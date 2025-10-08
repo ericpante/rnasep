@@ -1489,6 +1489,25 @@
       "Author": "Dan Tenenbaum [aut], Bioconductor Package Maintainer [aut, cre], Martin Morgan [ctb], Kozo Nishida [ctb], Marcel Ramos [ctb], Kristina Riemer [ctb], Lori Shepherd [ctb], Jeremy Volkening [ctb]",
       "Maintainer": "Bioconductor Package Maintainer <maintainer@bioconductor.org>"
     },
+    "KOGMWU": {
+      "Package": "KOGMWU",
+      "Version": "1.2",
+      "Source": "Repository",
+      "Type": "Package",
+      "Title": "Functional Summary and Meta-Analysis of Gene Expression Data",
+      "Date": "2019-02-19",
+      "Author": "Mikhail V. Matz",
+      "Maintainer": "Mikhail V. Matz <matz@utexas.edu>",
+      "Description": "Rank-based tests for enrichment of KOG (euKaryotic Orthologous Groups) classes with up- or down-regulated genes based on a continuous measure. The meta-analysis is based on correlation of KOG delta-ranks across datasets (delta-rank is the difference between mean rank of genes belonging to a KOG class and mean rank of all other genes). With binary measure (1 or 0 to indicate significant and non-significant genes), one-tailed Fisher's exact test for over-representation of each KOG class among significant genes will be performed.",
+      "License": "GPL-3",
+      "Depends": [
+        "R (>= 2.10)",
+        "pheatmap"
+      ],
+      "NeedsCompilation": "no",
+      "Repository": "CRAN",
+      "Encoding": "UTF-8"
+    },
     "MASS": {
       "Package": "MASS",
       "Version": "7.3-65",

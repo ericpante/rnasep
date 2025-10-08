@@ -49,120 +49,119 @@ list(
   tar_target(AnnotationFile, readRDS(FullAnnot)),                                                  #
   ##################################################################################################
   ##################################################################################################
-  tar_target(file, "configFiles/Design_Deseq1.tsv"), # Script 1
-  tar_target(meta, ReadMeta(file)), # Read and prepare SampleTable
-  tar_target(sampleTable1, tidyMeta(meta, "CT8.1", "Hg7.7")), #
+  tar_target(file, "configFiles/Design_Deseq1.tsv"),                                               # Script 1
+  tar_target(meta, ReadMeta(file)),                                                                # Read and prepare SampleTable
+  tar_target(sampleTable1, tidyMeta2(meta)),                                                       #
   ##################################################################################################
   ##################################################################################################
-  tar_target(directory, "data/analyseDiff"), # Script 2
-  tar_target(star1, BuildDESeq(ST = sampleTable1, DIR = directory)), # Build the DESeq object from counts files
+  tar_target(directory, "data/analyseDiff"),                                                       # Script 2
+  tar_target(star1, BuildDESeq(ST = sampleTable1, DIR = directory, DES=~Treatment)),               # Build the DESeq object from counts files
   ##################################################################################################
   ##################################################################################################
-  tar_target(dds1, DEanalysis(star1, "Wald")), # Script3
-  tar_target(DEG1, RetrieveDEG(dds1, "Treatment_Hg7.7_vs_CT8.1", 0.5)), # Running DE analysis and retrieving DEGs
-  tar_target(DEG1annot, AnnotDE(DEG1, AnnotationFile)), #
+  tar_target(dds1, DEanalysis(star1, "Wald")),                                                     # Script3
+  tar_target(DEG1, RetrieveDEG(dds1, "Treatment_Hg7.7_vs_CT8.1", 0.5)),                            # Running DE analysis and retrieving DEGs
+  tar_target(DEG1annot, AnnotDE(DEG1, AnnotationFile)),                                            #
   ##################################################################################################
   ##################################################################################################
-  tar_target(Heat1, HeatDEG(dds1, DEG1, AnnotationFile, 2, 2, rows = FALSE)), # Scripts 4 & 5
-  tar_target(ExportHeat1, PlotExport("results/Analysediff/figures/HgCO2_heatmap.png", Heat1)), # Build & export heatmap of DEGs
+  tar_target(Heat1, HeatDEG(dds1, DEG1, AnnotationFile, 2, 2, rows = FALSE)),                      # Scripts 4 & 5
+  tar_target(ExportHeat1, PlotExport("results/Analysediff/figures/HgCO2_heatmap.png", Heat1)),     # Build & export heatmap of DEGs
   ##################################################################################################
   ##################################################################################################
   ##################################################################################################
   ##################################################################################################
-  tar_target(GOforMWU1, goMWU(dds1, "Treatment_Hg7.7_vs_CT8.1", AnnotationFile)), #
-  tar_target(GENEforMWU1, geneMWU(dds1, "Treatment_Hg7.7_vs_CT8.1", 0.5, GOforMWU1)), # Script 6
-  tar_target(GOTable, ExportGO(GOforMWU1, "R/AnalyseDiff/GOMWU/GeneToGO.tab")), # Build & Export Go & Gene files to be used by GOMWU (external scripts, cf. https://github.com/z0on/GO_MWU)
-  tar_target(GENEtable1, ExporteGENE(GENEforMWU1, "R/AnalyseDiff/GOMWU/GeneToValue.csv")), #
+  tar_target(GOforMWU1, goMWU(dds1, "Treatment_Hg7.7_vs_CT8.1", AnnotationFile)),                  #
+  tar_target(GENEforMWU1, geneMWU(dds1, "Treatment_Hg7.7_vs_CT8.1", 0.5, GOforMWU1)),              # Script 6
+  tar_target(GOTable, ExportGO(GOforMWU1, "R/AnalyseDiff/GOMWU/GeneToGO.tab")),                    # Build & Export Go & Gene files to be used by GOMWU (external scripts, cf. https://github.com/z0on/GO_MWU)
+  tar_target(GENEtable1, ExporteGENE(GENEforMWU1, "R/AnalyseDiff/GOMWU/GeneToValue.csv")),         #
   ##################################################################################################
   ########################################## Hg vs CT ##############################################
   ##################################################################################################
-  tar_target(sampleTable2, tidyMeta(meta, "CT8.1", "Hg8.1")), #
+  tar_target(DEG2, RetrieveDEG(dds1, "Treatment_Hg8.1_vs_CT8.1", 0.5)),                            # Script3
+  tar_target(DEG2annot, AnnotDE(DEG2, AnnotationFile)),                                            # Retrieving DEGs
   ##################################################################################################
   ##################################################################################################
-  tar_target(star2, BuildDESeq(ST = sampleTable2, DIR = directory)), #
-  ##################################################################################################
-  ##################################################################################################
-  tar_target(dds2, DEanalysis(star2, "Wald")), # Script3
-  tar_target(DEG2, RetrieveDEG(dds2, "Treatment_Hg8.1_vs_CT8.1", 0.5)), # Running DE analysis and retrieving DEGs
-  tar_target(DEG2annot, AnnotDE(DEG2, AnnotationFile)), #
-  ##################################################################################################
-  ##################################################################################################
-  tar_target(Heat2, HeatDEG(dds2, DEG2, AnnotationFile, 2, 2)), # Scripts 4 & 5
-  tar_target(ExportHeat2, PlotExport("results/Analysediff/figures/Hg_heatmap.png", Heat2)), # Build & export heatmap of DEGs
+  tar_target(Heat2, HeatDEG(dds1, DEG2, AnnotationFile, 2, 2)),                                    # Scripts 4 & 5
+  tar_target(ExportHeat2, PlotExport("results/Analysediff/figures/Hg_heatmap.png", Heat2)),        # Build & export heatmap of DEGs
   ################################################################################################## Too few DEGs so don't need to go further on functional enrichement analysis.
   ########################################## CO2 vs CT #############################################
   ##################################################################################################
-  tar_target(sampleTable3, tidyMeta(meta, "CT8.1", "CT7.7")), #
+  tar_target(DEG3, RetrieveDEG(dds1, "Treatment_CT7.7_vs_CT8.1", 0.5)),                            # Script3
+  tar_target(DEG3annot, AnnotDE(DEG3, AnnotationFile)),                                            # Retrieving DEGs
   ##################################################################################################
   ##################################################################################################
-  tar_target(star3, BuildDESeq(ST = sampleTable3, DIR = directory)), #
-  ##################################################################################################
-  ##################################################################################################
-  tar_target(dds3, DEanalysis(star3, "Wald")), # Script3
-  tar_target(DEG3, RetrieveDEG(dds3, "Treatment_CT8.1_vs_CT7.7", 0.5)), # Running DE analysis and retrieving DEGs
-  tar_target(DEG3annot, AnnotDE(DEG3, AnnotationFile)),
-  ##################################################################################################
-  ##################################################################################################
-  tar_target(Heat3, HeatDEG(dds3, DEG3, AnnotationFile, 2, 2)), # Scripts 4 & 5
-  tar_target(ExportHeat3, PlotExport("results/Analysediff/figures/CO2_heatmap.png", Heat3)), # Build & export heatmap of DEGs
+  tar_target(Heat3, HeatDEG(dds1, DEG3, AnnotationFile, 2, 2)),                                    # Scripts 4 & 5
+  tar_target(ExportHeat3, PlotExport("results/Analysediff/figures/CO2_heatmap.png", Heat3)),       # Build & export heatmap of DEGs
   ################################################################################################## Too few DEGs so don't need to go further on functional enrichement analysis.
   ############################################# ALL ################################################
-  tar_target(SumDEGplot, SumDEG(DEG1, DEG2, DEG3)),
+  tar_target(SumDEGplot, SumDEG(DEG1, DEG2, DEG3)),                                                #
   ##################################################################################################
-  tar_target(VennData, BuildVennData(DEG1, DEG2, DEG3)), #
-  tar_target(VennDiagram, displayVenn(VennData, #
-    category.names = c("HgCO2", "Hg", "CO2"), #
-    lwd = 2, #
-    lty = 4, # Script 07
-    fill = c("#81A88D", "#7294D4", "#E6A0C4"), # Comparing DEGs from the three contrasts
-    cex = 1.2, #
-    fontface = "italic", #
-    cat.cex = 1.3, #
-    cat.fontface = "bold", #
-    cat.default.pos = "outer", #
-    cat.dist = c(0.03, 0.03, 0.03)
-  )), #
-  tar_target(ExportVenn, PlotExport("results/AnalyseDiff/figures/VennDEGS.png", VennDiagram)), #
+  tar_target(VennData, BuildVennData(DEG1, DEG2, DEG3)),                                           #
+  tar_target(VennDiagram, displayVenn(VennData,                                                    #
+    category.names = c("HgCO2", "Hg", "CO2"),                                                      #
+    lwd = 2,                                                                                       #
+    lty = 4,                                                                                       # Script 07
+    fill = c("#81A88D", "#7294D4", "#E6A0C4"),                                                     # Comparing DEGs from the three contrasts
+    cex = 1.2,                                                                                     #
+    fontface = "italic",                                                                           #
+    cat.cex = 1.3,                                                                                 #
+    cat.fontface = "bold",                                                                         #
+    cat.default.pos = "outer",                                                                     #
+    cat.dist = c(0.03, 0.03, 0.03))),                                                              #
+  tar_target(ExportVenn, PlotExport("results/AnalyseDiff/figures/VennDEGS.png", VennDiagram)),     #
   ##################################################################################################
-  ###########################################################################################################
-  tar_target(file2, "results/AnalyseDiff/files/HgCO2_BP_results_table.txt"), #
-  tar_target(HgCO2_GOMWU_BP, loadGOMWU(file2)), # Script 08
-  tar_target(HgCO2_BP_Plot, PlotGOMWU(HgCO2_GOMWU_BP)), # Computing/Plotting GOMWU results
-  tar_target(ExportHgCO2_BP_Plot, PlotExport("results/AnalyseDiff/figures/HgCO2_BP.png", HgCO2_BP_Plot)), #
+  ####################################################################################################################################################
+  tar_target(file2, "results/AnalyseDiff/files/HgCO2_BP_results_rep_table.txt"),                                                                     #
+  tar_target(HgCO2_GOMWU_BP, loadGOMWU(file2)),                                                                                                      # Script 08
+  tar_target(HgCO2_BP_Plot, PlotGOMWU(HgCO2_GOMWU_BP)),                                                                                              # Computing/Plotting GOMWU results
+  tar_target(ExportHgCO2_BP_Plot, PlotExport("results/AnalyseDiff/figures/HgCO2_BP.png", HgCO2_BP_Plot, W=8, H=5, U="in")),                          #
+  ####################################################################################################################################################
+  ####################################################################################################################################################
+  ############################################ Hg CO2 Interaction ####################################################################################
+  tar_target(star2, BuildDESeq(ST = sampleTable1, DIR = directory, DES=~Mercury+pCO2+Mercury:pCO2, relevel_treatment=FALSE, factor_treatment=TRUE)), # Script 2
+  tar_target(dds2, DEanalysis(star2, TEST="LRT", reduced=~Mercury + pCO2)),                                                                          # Script3
+  tar_target(InteractingGenes, RetrieveINT(dds2, "MercuryHg.pCO28.1", 0.5)),                                                                         # Running DE analysis and retrieving DEGs -> Run resultsNames(tar_read(dds2)) to chose the contrast
+  tar_target(InteractingGenesannot, AnnotDE(InteractingGenes, AnnotationFile)),                                                                      #
+  tar_target(HeatINT, HeatDEG(dds2, InteractingGenes, AnnotationFile, 2, 3, rows = FALSE)),                                                          # Scripts 4 & 5
+  tar_target(ExportHeatINT, PlotExport("results/Analysediff/figures/Interaction_heatmap.png", HeatINT, W=10, H=7, U="in")),                          # Build & export heatmap of DEGs
+  ####################################################################################################################################################
+  tar_target(GOforMWU2, goMWU(dds2, "MercuryHg.pCO28.1", AnnotationFile)),                                                                           #
+  tar_target(GENEforMWU2, geneMWUINT(dds2, "MercuryHg.pCO28.1", GOforMWU2)),                                                                         # Script 6
+  tar_target(GOTable2, ExportGO(GOforMWU2, "R/AnalyseDiff/GOMWU/GeneIntToGO.tab")),                                                                  # Build & Export Go & Gene files to be used by GOMWU (external scripts, cf. https://github.com/z0on/GO_MWU)
+  tar_target(GENEtable2, ExporteGENE(GENEforMWU2, "R/AnalyseDiff/GOMWU/GeneIntToValue.csv")),                                                        #
+  ####################################################################################################################################################
+  ############################################ WGCNA #################################################################################################
+  ####################################################################################################################################################
+  tar_target(meta2, tidyMeta2(meta)),                                                                                                                #
+  tar_target(star, BuildDESeq(ST = meta2, DIR = directory)),                                                                                         #
+  tar_target(exp, StarToExp(star)),                                                                                                                  #
+  tar_target(ExprFilt, ExpFilt(exp)),                                                                                                                #
+  tar_target(check, checkSamples(ExprFilt)),                                                                                                         #
+  tar_target(sampleTree, findOut(ExprFilt)),                                                                                                         # Script 09
+  tar_target(PlotTree, plotTree("results/AnalyseDiff/figures/SampleTree.png", sampleTree, H = 93), format = "file"),                                 # Building coexpression network
+  tar_target(ExpFiltOut, rmOut(sampleTree, ExprFilt, H = 93)),                                                                                       #
+  tar_target(spt, softThres(ExpFiltOut)),                                                                                                            #
+  tar_target(R2, plotR2("results/AnalyseDiff/figures/R2.png", spt), format = "file"),                                                                #
+  tar_target(meanConnect, plotConnect("results/AnalyseDiff/figures/meanConnect.png", spt), format = "file"),                                         #
+  # tar_target(Adj, Adjacency(ExpOut, 8)),                                                                                                           # Adj is the weighted gene co-expression networks and contains 23,106 nodes (genes).
+  tar_target(net, moduleConstruct(ExpFiltOut, 8)),                                                                                                   #
   #################################################################################################################################################################
-  ############################################ WGCNA ##############################################################################################################
   #################################################################################################################################################################
-  tar_target(meta2, tidyMeta2(meta)), #
-  tar_target(star, BuildDESeq(ST = meta2, DIR = directory)), #
-  tar_target(exp, StarToExp(star)), #
-  tar_target(ExprFilt, ExpFilt(exp)), #
-  tar_target(check, checkSamples(ExprFilt)), #
-  tar_target(sampleTree, findOut(ExprFilt)), # Script 09
-  tar_target(PlotTree, plotTree("results/AnalyseDiff/figures/SampleTree.png", sampleTree, H = 93), format = "file"), # Building coexpression network
-  tar_target(ExpFiltOut, rmOut(sampleTree, ExprFilt, H = 93)), #
-  tar_target(spt, softThres(ExpFiltOut)), #
-  tar_target(R2, plotR2("results/AnalyseDiff/figures/R2.png", spt), format = "file"), #
-  tar_target(meanConnect, plotConnect("results/AnalyseDiff/figures/meanConnect.png", spt), format = "file"), #
-  # tar_target(Adj, Adjacency(ExpOut, 8)),                                                                                                                       # Adj is the weighted gene co-expression networks and contains 23,106 nodes (genes).
-  tar_target(net, moduleConstruct(ExpFiltOut, 8)), #
+  # tar_target(TOM.dissim,TOMdissim(Adj)),                                                                                                                        #
+  # tar_target(geneTree, TreeGene(TOM.dissim)),                                                                                                                   #
+  # tar_target(ME, BuildModules(geneTree, TOM.dissim)),                                                                                                           #
+  tar_target(ModuleColors, MEColors(net, ExpFiltOut)),                                                                                                            #
+  tar_target(ME.dissim, MEdissim(ExpFiltOut, ModuleColors)),                                                                                                      # Script 10
+  tar_target(merged, mergeModules(ExpFiltOut, ModuleColors)),                                                                                                     # Constructing Eigengene modules
+  tar_target(mergedMEs, retrieveMergedME(merged)),                                                                                                                #
+  tar_target(mergeColors, retrieveMergedColors(obj = merged, ModuleColors)),                                                                                      #
+  tar_target(DendroColors, plotDendroColors(net, ModuleColors, mergeColors, "results/AnalyseDiff/figures/dendroColors.png"), format = "file"),                    #
   #################################################################################################################################################################
-  #################################################################################################################################################################
-  # tar_target(TOM.dissim,TOMdissim(Adj)),                                                                                                                       #
-  # tar_target(geneTree, TreeGene(TOM.dissim)),                                                                                                                  #
-  # tar_target(ME, BuildModules(geneTree, TOM.dissim)),                                                                                                          #
-  tar_target(ModuleColors, MEColors(net, ExpFiltOut)), #
-  tar_target(ME.dissim, MEdissim(ExpFiltOut, ModuleColors)), # Script 10
-  tar_target(merged, mergeModules(ExpFiltOut, ModuleColors)), # Constructing Eigengene modules
-  tar_target(mergedMEs, retrieveMergedME(merged)), #
-  tar_target(mergeColors, retrieveMergedColors(obj = merged, ModuleColors)), #
-  tar_target(DendroColors, plotDendroColors(net, ModuleColors, mergeColors, "results/AnalyseDiff/figures/dendroColors.png"), format = "file"), #
-  #################################################################################################################################################################
-  #################################################################################################################################################################
-  tar_target(file3, "data/analyseDiff/Other/ExternalTraits.csv"), #
-  tar_target(ExtTraits, loadTraits(path = file3, SEP = ";", DEC = ",", Exp.Matrix = ExpFiltOut)), # Script 11
-  tar_target(CorrelationMatrix, ModTraitCor(ExpFiltOut, mergedMEs, ExtTraits)), # Matching eigengene modules and traits
+  ########################################################################################################################################################################
+  tar_target(file3, "data/analyseDiff/Other/ExternalTraits.csv"),                                                                                                        #
+  tar_target(ExtTraits, loadTraits(path = file3, SEP = ";", DEC = ",", Exp.Matrix = ExpFiltOut)),                                                                        # Script 11
+  tar_target(CorrelationMatrix, ModTraitCor(ExpFiltOut, mergedMEs, ExtTraits)),                                                                                          # Matching eigengene modules and traits
   tar_target(Matrix, plotcor(ExtTraits, mergedMEs, CorrelationMatrix, "results/AnalyseDiff/figures/Module-Traits-Correlation.png", 12, 10, "in", 300), format = "file"), #
-  #################################################################################################################################################################
+  #######################################################################################################################################################################
   #######################################################################################################################################################################################################
   tar_target(MMall, ModuleMembership(mergedMEs, ExpFiltOut)), #
   tar_target(HubGeneBlue, HubGenes(mergeColors, "blue", MMall, c("MMblue"), Variable = MMblue, Percent = 0.95, AnnotationFile)), # Script 12

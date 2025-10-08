@@ -82,14 +82,14 @@ SumDEG <- function(A, B, C) {
   dat %>%
     ggplot(aes(x = Condition, y = nobs, fill = Trend)) +
     geom_col(position = "dodge", color = "white") +
-    theme_bw() +
+    theme_bw(base_size=14) +
     scale_fill_manual(values = c("#046C9A", "#FD6467")) +
-    annotate("text", x = 0.8, y = 7, label = "2", color = "black", size = 6, fontface = "bold") +
-    annotate("text", x = 1.2, y = 7, label = "3", color = "black", size = 6, fontface = "bold") +
-    annotate("text", x = 1.8, y = 9, label = "5", color = "black", size = 6, fontface = "bold") +
-    annotate("text", x = 2.2, y = 14, label = "10", color = "black", size = 6, fontface = "bold") +
-    annotate("text", x = 2.8, y = 258, label = "254", color = "black", size = 6, fontface = "bold") +
-    annotate("text", x = 3.2, y = 65, label = "61", color = "black", size = 6, fontface = "bold") +
+    annotate("text", x = 0.8, y = 7, label = "4", color = "black", size = 6, fontface = "bold") +
+    annotate("text", x = 1.2, y = 7, label = "4", color = "black", size = 6, fontface = "bold") +
+    annotate("text", x = 1.8, y = 7, label = "4", color = "black", size = 6, fontface = "bold") +
+    annotate("text", x = 2.2, y = 7, label = "4", color = "black", size = 6, fontface = "bold") +
+    annotate("text", x = 2.8, y = 247, label = "244", color = "black", size = 6, fontface = "bold") +
+    annotate("text", x = 3.2, y = 46, label = "43", color = "black", size = 6, fontface = "bold") +
     theme(axis.text.x = element_text(size=10),
           axis.text.y = element_text(size=10),
           axis.title.y = element_text(size=12)) +

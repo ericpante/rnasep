@@ -5,12 +5,23 @@
 ###################################################
 
 # Build the DESeq operational file:
-BuildDESeq <- function(ST, DIR) {
-  DESeqDataSetFromHTSeqCount(
+BuildDESeq <- function(ST, DIR, DES, relevel_treatment=TRUE, factor_treatment=FALSE) {
+ X <- DESeqDataSetFromHTSeqCount(
     sampleTable = ST,
     directory = DIR,
-    design = ~Treatment
+    design = DES
   )
+ 
+ if(relevel_treatment){
+   X$Treatment <- relevel(X$Treatment, ref="CT8.1")
+ 
+   }
+ 
+ if(factor_treatment == TRUE){
+   X$pCO2 <- as.factor(X$pCO2)
+ }
+ 
+ return(X)
 }
 
 StarToExp <- function(STAR) {

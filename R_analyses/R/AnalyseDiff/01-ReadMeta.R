@@ -20,6 +20,8 @@ tidyMeta <- function(meta, A, B) {
 }
 
 tidyMeta2 <- function(meta) {
+  Meta <- meta %>%
+    mutate(SampleName = paste(SampleName, "-", Treatment))
   rownames(meta) <- meta$SampleName
 
   return(meta)

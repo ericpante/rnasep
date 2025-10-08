@@ -10,23 +10,88 @@ library(wesanderson)
 
 meta <- read.table("configFiles/Design_Deseq1.tsv", header = T, sep="\t")
 
-meta <- meta #%>%
+meta <- meta# %>%
   #filter(Treatment == "CT8.1" | Treatment == "Hg7.7")
 rownames(meta) <-  meta$SampleName
 
 View(meta)
-
+meta$pCO2 <- as.factor(meta$pCO2)
 
 star <- DESeqDataSetFromHTSeqCount(sampleTable = meta,
                            directory = "data/analyseDiff",
-                           design = ~ Treatment)
+                           design = ~ Mercury + pCO2 + pCO2:Mercury)
 
+STAR <- DESeqDataSetFromHTSeqCount(sampleTable = meta,
+                                   directory = "data/analyseDiff",
+                                   design = ~ Treatment)
 
 star <- estimateSizeFactors(star)
 star <- estimateDispersions(star)
 
+
 idx <- rowSums(counts(star,normalized=TRUE) >= 10 ) >= 1
 star <- star[idx,]
+
+
+dds <- DESeq(star, test="LRT", reduced = ~Mercury + pCO2)
+
+resultsNames(dds)
+
+HgEffect <- results(dds, name="Mercury_Hg_vs_CT")
+
+HgEffect <- HgEffect %>% # This objet contains every genes influences Treatment
+  data.frame() %>%
+  rownames_to_column(var = "ID") %>%
+  arrange(padj) %>%
+  filter(padj < 0.05 &
+           abs(log2FoldChange) > 0.5) %>%
+  select(ID, log2FoldChange)
+
+nrow(HgEffect)
+
+CO2Effect <- results(dds, name="pCO2_8.1_vs_7.7")
+
+CO2Effect <- CO2Effect %>% # This objet contains every genes influences Treatment
+  data.frame() %>%
+  rownames_to_column(var = "ID") %>%
+  arrange(padj) %>%
+  filter(padj < 0.05 &
+           abs(log2FoldChange) > 0.5) %>%
+  select(ID, log2FoldChange)
+
+nrow(CO2Effect)
+
+Int <- results(dds, name="MercuryHg.pCO28.1")
+
+Int <- Int %>% # This objet contains every genes influences Treatment
+  data.frame() %>%
+  rownames_to_column(var = "ID") %>%
+  arrange(padj) %>%
+  filter(padj < 0.05 &
+           abs(log2FoldChange) > 0.5) %>%
+  select(ID, log2FoldChange)
+
+nrow(Int)
+
+DDS <- DESeq(STAR)
+STAR$Treatment <- relevel(STAR$Treatment, ref="CT8.1")
+resultsNames(DDS)
+Hg <- results(DDS, name = "Treatment_Hg7.7_vs_CT8.1")
+
+Hg <- Hg %>% # This objet contains every genes influences Treatment
+  data.frame() %>%
+  rownames_to_column(var = "ID") %>%
+  arrange(padj) %>%
+  filter(padj < 0.05 &
+           abs(log2FoldChange) > 0.5) %>%
+  select(ID, log2FoldChange)
+
+nrow(Hg)
+
+
+
+
+
 
 
 

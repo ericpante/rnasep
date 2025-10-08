@@ -10,14 +10,14 @@
 goMWU <- function(dds, NAME, GO) {
   Res <- results(dds, name = NAME) %>%
     data.frame() %>%
-    rownames_to_column(var = "ID") %>%
+    tibble::rownames_to_column(var = "ID") %>%
     dplyr::filter(pvalue != "NA")
 
   GO %>%
     data.frame() %>%
     dplyr::filter(GOs != "NA" & GOs != "-" & Transcript %in% Res$ID) %>%
     dplyr::select(Transcript, GOs) %>%
-    dplyr::mutate(GOs = str_replace_all(GOs, ",", ";"))
+    dplyr::mutate(GOs = stringr::str_replace_all(GOs, ",", ";"))
 }
 
 
@@ -26,11 +26,29 @@ goMWU <- function(dds, NAME, GO) {
 geneMWU <- function(dds, NAME, THRESHOLD, Ref) {
   Res <- results(dds, name = NAME) %>% # This objet contains all the genes influences by Treatment
     data.frame() %>%
-    rownames_to_column(var = "ID") %>%
-    arrange(padj) %>%
+    tibble::rownames_to_column(var = "ID") %>%
+    plyr::arrange(padj) %>%
     dplyr::filter(pvalue != "NA") %>%
     dplyr::select(ID, log2FoldChange) %>%
     dplyr::filter(ID %in% Ref$Transcript)
+  
+  return(Res)
+}
+
+
+geneMWUINT <- function(dds, NAME, Ref) {
+  Res <- results(dds, name = NAME) %>% # This objet contains all the genes influences by Treatment
+    data.frame() %>%
+    tibble::rownames_to_column(var = "ID") %>%
+    plyr::arrange(padj) %>%
+    dplyr::filter(pvalue != "NA") %>%
+    dplyr::mutate(Sig = ifelse(pvalue < 0.05,
+                               1,
+                               0)) %>%
+    dplyr::select(ID, Sig) %>%
+    dplyr::filter(ID %in% Ref$Transcript)
+  
+  return(Res)
 }
 
 # Complete list of WGCNA analysed genes with value of belonging (1, 0)
