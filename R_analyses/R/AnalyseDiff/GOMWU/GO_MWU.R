@@ -44,8 +44,8 @@ gomwuStats(input, goDatabase, goAnnotations, goDivision,
 
 #png("HgCO2_CC.png", width=9, height=10, units="in", res=300)
 results=gomwuPlot(input,goAnnotations,goDivision,
-          #absValue=0.001,  # genes with the measure value exceeding this will be counted as "good genes". This setting is for signed log-pvalues. Specify absValue=0.001 if you are doing Fisher's exact test for standard GO enrichment or analyzing a WGCNA module (all non-zero genes = "good genes").
-          absValue=1, # un-remark this if you are using log2-fold changes
+          absValue=0.001,  # genes with the measure value exceeding this will be counted as "good genes". This setting is for signed log-pvalues. Specify absValue=0.001 if you are doing Fisher's exact test for standard GO enrichment or analyzing a WGCNA module (all non-zero genes = "good genes").
+          #absValue=1, # un-remark this if you are using log2-fold changes
           level1=0.05, # FDR threshold for plotting. Specify level1=1 to plot all GO categories containing genes exceeding the absValue.
           level2=0.01, # FDR cutoff to print in regular (not italic) font.
           level3=0.001, # FDR cutoff to print in large bold font.
@@ -124,7 +124,7 @@ res$GeneNumber = separated_ratio$A
 
 res <- res %>%
   filter(GOterms %in% bestGOs$name)
-write.table(res, "~/Documents/Recherche/Current/rnasep/R_analyses/results/AnalyseDiff/files/HgCO2_BP_results_rep_table.txt", quote = FALSE, row.names = FALSE, col.names = TRUE, sep="\t")
+write.table(res, "~/Documents/Recherche/Current/rnasep/R_analyses/results/AnalyseDiff/files/HgCO2INT_BP_results_rep_table.txt", quote = FALSE, row.names = FALSE, col.names = TRUE, sep="\t")
 
 res %>%
   ggplot(aes(Trend, GOterms, color=pval, size=GeneNumber)) +
