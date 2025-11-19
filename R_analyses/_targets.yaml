@@ -5,6 +5,9 @@ AnalyseDiff:
   script: AnalyseDiff_targets.R
   store: results/AnalyseDiff
   inherits: Annotation
+rnaediting:
+  script: rnaediting_targets.R
+  store: results/rnaediting
 rnasep1:
   script: rnasep1_targets.R
   store: rnasep1
