@@ -23,7 +23,7 @@ To easily reproduce this R project, one just need to:
 3. charging the project library with `renv::restore()`;
 4. run the *_targets.R scripts
 
-<img src="Workflow.png" width="600"/>
+<img src="WorkflowFinal.png" width="600"/>
 
 
 #########################################################################
