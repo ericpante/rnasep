@@ -15,4 +15,4 @@ module load transrate/1.0.3
 
 cd /shared/projects/rnasep/4-AssemblyAssessment/Assembly_Thin/stats
 
-transrate --assembly Trinity_rnasep2.Trinity95.fasta --threads=10 --output /shared/projects/rnasep/4-AssemblyAssessment/Assembly_Thin/stats
+transrate --assembly Trinity95_rnasep2_clean_min200.fasta --threads=10 --output /shared/projects/rnasep/4-AssemblyAssessment/Assembly_Thin/stats

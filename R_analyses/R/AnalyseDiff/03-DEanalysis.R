@@ -67,3 +67,22 @@ AnnotDE <- function(DEG, Annot) {
 
   return(Res)
 }
+
+GBAnnotDE <- function(DEG, Annot) {
+  valid_mapping <- Annot[Annot$product != "Hypothetical protein", c(1,6)]
+  
+  VM <- valid_mapping %>%
+    dplyr::group_by(gene) %>%
+    summarise(product = paste(sort(unique(product)), collapse = "/"))
+  
+  T2P <- setNames(VM$product, VM$gene)
+  
+  Res <- DEG
+  Res$ID <- ifelse(Res$ID %in% names(T2P),
+                   T2P[Res$ID],
+                   Res$ID
+  )
+  
+  return(Res)
+  
+}

@@ -12,7 +12,7 @@ library(visNetwork)
 
 # Set target options:
 tar_option_set(
-  packages = c("dplyr", "tidyverse", "DESeq2", "ggplot2", "pheatmap", "pcaExplorer", "RColorBrewer", "VennDiagram", "wesanderson", "WGCNA") # Packages that your targets need for their tasks.
+  packages = c("readxl", "dplyr", "tidyverse", "DESeq2", "ggplot2", "pheatmap", "pcaExplorer", "RColorBrewer", "VennDiagram", "wesanderson", "WGCNA") # Packages that your targets need for their tasks.
   # Pipelines that take a long time to run may benefit from
   # optional distributed computing. To use this capability
   # in tar_make(), supply a {crew} controller
@@ -273,6 +273,64 @@ list(
   tar_target(ExportTan_BP_Plot, PlotExport("results/AnalyseDiff/figures/Tan_BP.png", Tan_BP_Plot)),                                    # Tan
   ######################################################################################################################################
   ######################################################################################################################################
+  ######################################################################################################################################
+  ################## GENOME BASED ######################################################################################################
+  ######################################################################################################################################
+  ######################################################################################################################################
+  ##################################################################################################
+  ################## HgCO2 vs CT ###################################################################
+  tar_target(GBAnnotationFile, "configFiles/mpibr_sepoff_v1_annotations.tsv"),                     #
+  tar_target(GBemapperFile, "configFiles/mpibr_sepoff_v1.emapper.annotations.xlsx"),
+  tar_target(GBannot, ReadMeta(GBAnnotationFile)),
+  tar_target(GBmapper, ReadMapper(GBemapperFile)),
+  tar_target(GBAnnotationFull, BuildAnnotation(GBmapper, GBannot)),
+  tar_target(GBdirectory, "data/analyseDiff/GenomeBased"),                                         # Script 2
+  tar_target(GBstar1, BuildDESeq(ST = sampleTable1, DIR = GBdirectory, DES=~Treatment)),             # Build the DESeq object from counts files
+  ##################################################################################################
+  ##################################################################################################
+  tar_target(GBdds1, DEanalysis(GBstar1, "Wald")),                                                 # Script3
+  tar_target(GBDEG1, RetrieveDEG(GBdds1, "Treatment_Hg7.7_vs_CT8.1", 0.5)),                        # Running DE analysis and retrieving DEGs
+  tar_target(GBDEG1annot, GBAnnotDE(GBDEG1, GBannot)),                                             # # 269 DEGs
+  ##################################################################################################
+  ##################################################################################################
+  tar_target(GBHeat1, HeatDEG(GBdds1, X=c("5","6","8","9","37","38","39","80","28","30","31","32","68"), GBDEG1, GBannot, 2, 2, rows = FALSE)),                      # Scripts 4 & 5
+  tar_target(GBExportHeat1, PlotExport("results/Analysediff/figures/HgCO2_heatmap.GB.jpg", GBHeat1, W=6, H=7, U="in")),     # Build & export heatmap of DEGs
+  ##################################################################################################
+  ########################################## Hg vs CT ##############################################
+  ##################################################################################################
+  tar_target(GBDEG2, RetrieveDEG(GBdds1, "Treatment_Hg8.1_vs_CT8.1", 0.5)),                        # Script3
+  tar_target(GBDEG2annot, AnnotDE(GBDEG2, GBannot)),                                               # Retrieving DEGs
+  ##################################################################################################
+  ##################################################################################################
+  tar_target(GBHeat2, HeatDEG(GBdds1, X=c("5","6","8","9","37","38","39","80","19","20","21","24","25","55","56"), GBDEG2, GBannot, 2, 2, rows=TRUE)),                                     # Scripts 4 & 5
+  tar_target(GBExportHeat2, PlotExport("results/Analysediff/figures/Hg_heatmap.GB.jpg", GBHeat2, W=6, H=7, U="in")), # Build & export heatmap of DEGs
+  ################################################################################################## Too few DEGs so don't need to go further on functional enrichement analysis.
+  ########################################## CO2 vs CT #############################################
+  ##################################################################################################
+  tar_target(GBDEG3, RetrieveDEG(GBdds1, "Treatment_CT7.7_vs_CT8.1", 0.5)),                        # Script3
+  tar_target(GBDEG3annot, AnnotDE(GBDEG3, GBannot)),                                               # Retrieving DEGs
+  ##################################################################################################
+  ##################################################################################################
+  tar_target(GBHeat3, HeatDEG(GBdds1, X=c("5","6","8","9","37","38","39","80","10","11","12","13","46","48","85","86"), GBDEG3, GBannot, 2, 2, rows = TRUE)),                                     # Scripts 4 & 5
+  tar_target(GBExportHeat3, PlotExport("results/Analysediff/figures/CO2_heatmap.GB.jpg", GBHeat3, W=15, H=7, U="in")), # Build & export heatmap of DEGs
+  ################################################################################################## Too few DEGs so don't need to go further on functional enrichement analysis.
+  ############################################# ALL ################################################
+  tar_target(GBSumDEGplot, SumDEG(GBDEG1, GBDEG2, GBDEG3)),                                                #
+  ##################################################################################################
+  tar_target(GBVennData, BuildVennData(GBDEG1, GBDEG2, GBDEG3)),                                   #
+  tar_target(GBVennDiagram, displayVenn(GBVennData,                                                #
+                                      category.names = c("HgCO2", "Hg", "CO2"),                    #
+                                      lwd = 2,                                                     #
+                                      lty = 4,                                                     # Script 07
+                                      fill = c("#81A88D", "#7294D4", "#E6A0C4"),                   # Comparing DEGs from the three contrasts
+                                      cex = 1.2,                                                   #
+                                      fontface = "italic",                                         #
+                                      cat.cex = 1.3,                                               #
+                                      cat.fontface = "bold",                                       #
+                                      cat.default.pos = "outer",                                   #
+                                      cat.dist = c(0.03, 0.03, 0.03))),                            #
+  tar_target(GBExportVenn, PlotExport("results/AnalyseDiff/figures/VennDEGS.GB.jpg", GBVennDiagram, W=6, H=6, U="in")),     #
+  ##################################################################################################
   tar_render(Report, path = "Report/RNAsep2_DEanalysis_Report2.Rmd")
 )
 

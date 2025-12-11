@@ -6,18 +6,25 @@
 
 
 # Heatmap
-HeatDEG <- function(dds, DEG, Annot, ncutrow, ncutcol, rows = TRUE) {
+HeatDEG <- function(dds, X, DEG, Annot, ncutrow, ncutcol, rows = TRUE) {
   vsd <- vst(dds)
   a <- assay(vsd) %>%
     as.data.frame() %>%
-    rownames_to_column(var = "ID") %>%
+    select(X) %>%
+    tibble::rownames_to_column(var = "ID") %>%
     filter(ID %in% DEG$ID)
 
-  valid_mapping <- Annot[!is.na(Annot$Preferred_name) & Annot$Preferred_name != "-", ]
-  transcript_to_preferred <- setNames(valid_mapping$Preferred_name, valid_mapping$Transcript)
+  valid_mapping <- Annot[Annot$product != "Hypothetical protein", c(1,6)]
+  
+  VM <- valid_mapping %>%
+    dplyr::group_by(gene) %>%
+    summarise(product = paste(sort(unique(product)), collapse = "/"))
+  
+  T2P <- setNames(VM$product, VM$gene)
+  
 
-  a$ID <- ifelse(a$ID %in% names(transcript_to_preferred),
-    transcript_to_preferred[a$ID],
+  a$ID <- ifelse(a$ID %in% names(T2P),
+    T2P[a$ID],
     a$ID
   )
 
@@ -33,7 +40,7 @@ HeatDEG <- function(dds, DEG, Annot, ncutrow, ncutcol, rows = TRUE) {
   Matrix <- b %>%
     select(-ID)
 
-  pheatmap((Matrix), # Modify parameters as convenience
+  pheatmap::pheatmap((Matrix), # Modify parameters as convenience
     cluster_cols = TRUE,
     clustering_distance_rows = "correlation",
     clustering_distance_cols = "euclidean",

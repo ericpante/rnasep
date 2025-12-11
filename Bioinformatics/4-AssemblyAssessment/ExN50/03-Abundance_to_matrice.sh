@@ -16,7 +16,7 @@ module load trinity/2.15.1
 cd /shared/projects/rnasep/4-AssemblyAssessment/Assembly_Thin/E90N50
 
 #Defining variables
-INDEX=rnasep2_Trinity95_Kallisto
+INDEX=rnasep2_Trinity95_clean_Kallisto
 OUTPUT=rnasep2_assembly95
 
 abundance_estimates_to_matrix.pl --est_method kallisto --gene_trans_map Trinity_rnasep2.Trinity95.fasta.gene_trans_map --out_prefix rnasep2\

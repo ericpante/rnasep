@@ -16,17 +16,23 @@ load_eggnog <- function(file){
 
 
 # 2- Tidying data
-Tidy_eggnog <- function(data, other, filter_on=TRUE){
+Tidy_eggnog <- function(data){
   data <- data %>%
-    select(query,COG_category,Description,Preferred_name,GOs,KEGG_ko,KEGG_Pathway,PFAMs) %>%
+    dplyr::select(query,COG_category,Description,Preferred_name,GOs,KEGG_ko,KEGG_Pathway,PFAMs) %>%
     unique() %>%
-    rename(Transcript=query,
-           COG_Description=Description)
+    dplyr::rename(Transcript=query,
+           COG_Description=Description) %>%
+    dplyr::filter(stringr::str_detect(Transcript, "^TRINITY_")) %>%
+    dplyr::group_by(Transcript) %>%
+    dplyr::summarise(across(
+      .cols = everything(),
+      .fns = ~ {
+        vals <- unique(.x[.x != "-" & .x != "" & !is.na(.x)])
+        if (length(vals) == 0) "-" else paste(vals, collapse = "/")
+      }
+    ))
   
-  if(filter_on){
-    data <- data %>%
-      filter(!Transcript %in% other[,1])
-  }
+  
   
   return(data)
 }

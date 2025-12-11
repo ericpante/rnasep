@@ -15,4 +15,4 @@ module load trinity/2.15.1
 
 cd /shared/projects/rnasep/4-AssemblyAssessment/Assembly_Thin/CountingFullLength/
 
-analyze_blastPlus_topHit_coverage.pl blastx95.outfmt6 Trinity_rnasep2.Trinity95.fasta uniprot_sprot.fasta
+analyze_blastPlus_topHit_coverage.pl blastx95.outfmt6 Trinity95_rnasep2_clean_min200.fasta uniprot_sprot.fasta

@@ -15,4 +15,4 @@ module load busco/5.5.0
 
 cd /shared/projects/rnasep/4-AssemblyAssessment/Assembly_Thin/Completeness
 
-busco -i Trinity_rnasep2.Trinity95.fasta -m transcriptome -l mollusca_odb10 -c 20 -o BUSCO_rnasep2
+busco -i Trinity95_rnasep2_clean_min200.fasta -m transcriptome -l mollusca_odb10 -c 20 -o BUSCO_rnasep2

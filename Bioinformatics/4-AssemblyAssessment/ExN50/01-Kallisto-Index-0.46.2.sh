@@ -16,7 +16,7 @@ module load kallisto/0.46.2
 cd /shared/projects/rnasep/4-AssemblyAssessment/Assembly_Thin/E90N50
 
 #Defining variables
-ASSEMBLY=Trinity_rnasep2.Trinity95.fasta
-BASE=rnasep2_Trinity95_Kallisto
+ASSEMBLY=Trinity95_rnasep1_clean_min200.fasta
+BASE=rnasep1_Trinity95_Kallisto
 
 kallisto index -i ${BASE} ${ASSEMBLY}

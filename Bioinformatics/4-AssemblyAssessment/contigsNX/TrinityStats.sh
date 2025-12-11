@@ -15,4 +15,4 @@ module load trinity/2.15.1
 
 cd /shared/projects/rnasep/4-AssemblyAssessment/Assembly_Thin/contigsNX
 
-TrinityStats.pl Trinity_rnasep2.Trinity95.fasta
+TrinityStats.pl Trinity95_rnasep1_clean_min200.fasta

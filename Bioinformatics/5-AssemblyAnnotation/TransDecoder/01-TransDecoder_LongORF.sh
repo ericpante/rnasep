@@ -15,4 +15,4 @@ module load transdecoder/5.7.0
 
 cd /shared/projects/rnasep/5-AssemblyAnnotation/TransDecoder/Assembly_Thin/
 
-TransDecoder.LongOrfs -t Trinity_rnasep2.Trinity95.fasta
+TransDecoder.LongOrfs -t Trinity95_rnasep2_clean_min200.fasta

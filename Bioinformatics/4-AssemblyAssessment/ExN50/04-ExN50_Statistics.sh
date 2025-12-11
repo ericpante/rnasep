@@ -17,7 +17,7 @@ cd /shared/projects/rnasep/4-AssemblyAssessment/Assembly_Thin/E90N50
 
 #Defining variables
 MATRIX=rnasep2.isoform.TMM.EXPR.matrix
-ASSEMBLY=Trinity_rnasep2.Trinity95.fasta
+ASSEMBLY=Trinity95_rnasep2_clean_min200.fasta
 OUTPUT=rnasep2_ExN50.transcript95.stats
 
 contig_ExN50_statistic.pl ${MATRIX} ${ASSEMBLY} transcript | tee ${OUTPUT}

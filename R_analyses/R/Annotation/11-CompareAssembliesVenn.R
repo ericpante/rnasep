@@ -5,70 +5,101 @@
 #
 ###############################################################################
 
-fileA="data/annotation/Trinity_rnasep1.Trinity95.fasta.transdecoder.cds"
-fileB="data/annotation/Trinity_rnasep2.Trinity95.fasta.transdecoder.cds"
-fileC="data/annotation/SEP1.SEP2.blastn.outfmt6"
-
-
-# Build Venn data from the gff3 and blast files.
-BuildVennData <- function(fileA, fileB, fileC){
+# Build and display Venn diagram.
+displayVenn <- function(fileA, fileB, fileC){
   
   # Loading files
-  sep1 <- read.delim(fileA, header=FALSE, sep=" ")
-  sep2 <- read.delim(fileB, header=FALSE, sep=" ")
-  blast <- read.delim(fileC, header=FALSE)
+  RBH <- read.delim(fileA, header=FALSE)
+  sep1ALL <- read.delim(fileB, header=FALSE)
+  sep2ALL <- read.delim(fileC, header=FALSE)
+
+  # Creating the list of RBH with common IDs for sep1 & 2
+  RBHV1 <- as.data.frame(RBH$V1)
+  colnames(RBHV1) <- "ID"
   
-  # Keep only headers
-  Sep1 <- sep1[grepl("^>TRINITY", sep1$V1),]
-  Sep2 <- sep2[grepl("^>TRINITY", sep2$V1),]
   
-  # Remonving undesired characters from the variable V1
-  Sep1$V1 <- gsub(">", "", Sep1$V1)
-  Sep2$V1 <- gsub(">", "", Sep2$V1)
+  # Building list of transcripts to be used in Venn
+  sep1Tidy <- sep1ALL %>%
+    dplyr::rename(ID = V1) %>%
+    dplyr::filter(!ID %in% RBH$V1) %>%
+    dplyr::mutate(ID = paste(ID, "_sep1", sep=""))
   
-  Sep1$X <- "NA"
+  sep1 <- rbind(sep1Tidy, RBHV1)
+
+  sep2Tidy <- sep2ALL %>%
+    dplyr::rename(ID = V1) %>%
+    dplyr::filter(!ID %in% RBH$V2) %>%
+    dplyr::mutate(ID = paste(ID, "_sep2", sep=""))
   
-  # Changing col names for sep1 & 2
-#  colnames(sep1) <- c("Transcript", "2", "Type", "4", "5", "6", "7", "8", "9")
- # colnames(sep2) <- c("Transcript", "2", "Type", "4", "5", "6", "7", "8", "9")
+  sep2 <- rbind(sep2Tidy, RBHV1)
   
-  # Tidying Sep1 & 2, adding X col to Sep1
-#  TidySep1 <- sep1 %>%
-#    filter(Type == "mRNA") %>%
-#    separate(9, sep =";", into=c("A", "B", "C")) %>%
-#    separate(A, sep="=", into=c("A", "ID")) %>%
-#    select(ID) %>%
-#    mutate(X = "NA")
+  # Creating list for Venn
+  VennData <- list(
+    A=sep1$ID,
+    B=sep2$ID)
   
-#  TidySep2 <- sep2 %>%
-#    filter(Type == "mRNA") %>%
-#    separate(9, sep =";", into=c("A", "B", "C")) %>%
-#    separate(A, sep="=", into=c("A", "ID")) %>%
-#    select(ID)
+  # Specifying the name for each component of the list
+  names(VennData) <- c("Newly hatched", "One-month-old")
   
-  # Tidying Blast file
-  BLAST <- blast %>%
-    dplyr::select(V1, V2) %>%
-    unique()
+  library(ggvenn)
   
-  # Building a common ID between sep1 & 2 (needed for comparing both datasets)
-  Sep1$X <- ifelse(Sep1$V1 %in% BLAST$V2,
-                       BLAST$V1[match(Sep1$V1, BLAST$V2)],
-                       Sep1$V1)
-  
-  # Listing Sep1 & 2 IDs in the object x
-  x <- list(
-    A=Sep2$V1,
-    B=Sep1$X)
-  
-  return(x)
-  
+  ggvenn(
+    VennData,
+    columns = c("Newly hatched", "One-month-old"),
+    show_stats = "c",
+    fill_color = c("#46ACC8", "#E58601"),
+    fill_alpha=0.5,
+    auto_scale = FALSE,
+    stroke_size = 0.3,
+    set_name_size = 6,
+    text_size = 5,
+    padding=0.6
+  )
 }
 
-# Displaying the VennDiagram
-displayVenn <- function(x,...){
+
+displaySpecific <- function(fileA, fileB, fileC, exp="SEP1"){
+
+  RBH <- read.delim("data/annotation/RBH_pairs.tsv", header=FALSE)
+  ALL <- read.delim("data/annotation/SEP1_all_ids_clean.txt", header=FALSE)
+  spec <- read.delim("data/annotation/SEP1_specific_nohit.txt", header=FALSE)
   
-  venn.diagram(x, filename=NULL, ...)
+  if(exp == "SEP1"){
+    alltidy <- ALL %>%
+    dplyr::rename(ID = V1) %>%
+    dplyr::filter(!ID %in% RBH$V1) %>%
+    dplyr::mutate(type = ifelse(ID %in% spec$V1,
+                                "specific",
+                                "not specific"),
+                  n = 1)
+  } else {
+    alltidy <- ALL %>%
+      dplyr::rename(ID = V1) %>%
+      dplyr::filter(!ID %in% RBH$V2) %>%
+      dplyr::mutate(type = ifelse(ID %in% spec$V1,
+                                  "specific",
+                                  "not specific"),
+                    n = 1)
+  }
   
+  x <- nrow(alltidy)
   
+  sep.plot <- alltidy %>%
+    group_by(type) %>%
+    summarise(Percent = (sum(n)/x)*100)
+  
+  sep.plot %>%
+    ggplot(aes(x=type, y=Percent, fill=type)) +
+    geom_col(just = 0.5) +
+    theme_minimal() +
+    theme(legend.position = "none",
+          axis.text = element_text(size = 11),
+          text = element_text(size=12),
+          panel.grid = element_blank(),
+          axis.line.x.bottom = element_line(),
+          axis.line.y.left = element_line()) +
+    scale_fill_manual(values=c("#DD8D29", "#E2D200")) +
+    scale_y_continuous(breaks = c(20,40,60,80)) +
+    labs(y="% ORFs",
+         x="")
 }

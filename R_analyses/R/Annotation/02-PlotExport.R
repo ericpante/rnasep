@@ -4,6 +4,6 @@
 
 ####################################
 
-PlotExport <- function(file, plot){
-  ggsave(file, plot, dpi=300)
+PlotExport <- function(file, plot, W = NA, H = NA, U = c("in", "cm", "mm", "px")){
+  ggsave(file, plot, dpi=300, width = W, height = H, units = U)
 }

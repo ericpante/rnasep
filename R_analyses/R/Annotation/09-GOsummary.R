@@ -5,18 +5,18 @@
 
 ###############################################################################
 
-
 # Building a dataframe summarizing the GO annotation with important features
 summarizeGO <- function(data, go){
-  # retrieving GO terms from the AggNOG output counting Go occurences 
+  # retrieving GO terms from the FullAnnot
   Data <- data %>%
-    select(Transcript, GOs) %>% 
-    filter(GOs != "-") %>%
-    separate_rows(GOs, sep=",") %>%
-    count(GOs)
+    dplyr::select(Transcript, GO) %>% 
+    dplyr::filter(GO != "-") %>%
+    tidyr::separate_rows(GO, sep=";") %>%
+    tidyr::separate_rows(GO, sep=",") %>%
+    dplyr::count(GO)
   
   # Adding Names and Namespaces to the GO terms
-  Final <- merge(Data, go, by.x="GOs", by.y="GO_term", all.x=TRUE)
+  Final <- merge(Data, go, by.x="GO", by.y="GO_term", all.x=TRUE)
   
   return(Final)
 }
@@ -27,26 +27,23 @@ PlotGO <- function(data, NS1, NS2, NS3){
 
   
   x <- data %>%
-    filter(Namespace==NS1) %>%
-    arrange(desc(n)) %>%
-    tidyr::unite(GOterms, GOs,Name, sep="-") %>%
-    separate(GOterms, into=c("GO", "Description"), sep="- ")
+    dplyr::filter(Namespace==NS1) %>%
+    dplyr::arrange(desc(n)) %>%
+    dplyr::rename(Description = Name)
   
   X <- x[2:21,]
   
   y <- data %>%
     filter(Namespace==NS2) %>%
     arrange(desc(n)) %>%
-    unite(GOterms, GOs,Name, sep="-") %>%
-    separate(GOterms, into=c("GO", "Description"), sep="- ")
+    dplyr::rename(Description = Name)
   
   Y <- y[2:21,]
   
   z <- data %>%
     filter(Namespace==NS3) %>%
     arrange(desc(n)) %>%
-    unite(GOterms, GOs,Name, sep="-") %>%
-    separate(GOterms, into=c("GO", "Description"), sep="- ")
+    dplyr::rename(Description = Name)
   
   Z <- z[2:21,]
   
@@ -55,10 +52,10 @@ PlotGO <- function(data, NS1, NS2, NS3){
     arrange(desc(n), .by_group=TRUE)
   
   Sum %>%
-    ggplot(aes(x=reorder(Description, n), y=n, fill=Namespace)) +
+    ggplot(aes(x=reorder(Description, n), y=n/100, fill=Namespace)) +
     geom_col() +
     facet_wrap(~Namespace, scales="free", ncol=1) +
-    scale_fill_manual(values=wes_palette(n=3, name="GrandBudapest2")) +
+    scale_fill_manual(values=wes_palette(n=3, name="Cavalcanti1")) +
     theme_bw() +
     theme(axis.text.y=element_text(size=6),
           legend.position = "none",
@@ -66,5 +63,5 @@ PlotGO <- function(data, NS1, NS2, NS3){
           axis.title.y=element_text(size=9)) +
     coord_flip() +
     labs(x="GO terms",
-         y="Occurrences")
+         y="Occurrences (x100)")
 }
