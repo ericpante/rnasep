@@ -45,11 +45,15 @@ BuildAnnotation <- function(fileA, fileB) {
   
   return(Annotation)
 }
+
+#meta <- tar_read(meta)
 # Function to tidy metadata file
-tidyMeta <- function(meta, A, B) {
+tidyMeta <- function(meta) {
   Meta <- meta %>%
-    mutate(SampleName = paste(SampleName, "-", Treatment)) %>%
-    filter(Treatment == A | Treatment == B)
+    filter(SampleName != "80") %>%
+    filter(SampleName != "39")
+    #mutate(SampleName = paste(SampleName, "-", Treatment))
+    #filter(Treatment == A | Treatment == B | Treatment == C)
   rownames(Meta) <- Meta$SampleName
 
   return(Meta)

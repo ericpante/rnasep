@@ -12,7 +12,7 @@ library(visNetwork)
 
 # Set target options:
 tar_option_set(
-  packages = c("readxl", "dplyr", "tidyverse", "DESeq2", "ggplot2", "pheatmap", "pcaExplorer", "RColorBrewer", "VennDiagram", "wesanderson", "WGCNA") # Packages that your targets need for their tasks.
+  packages = c("readxl", "dplyr", "tidyverse", "DESeq2", "ggplot2", "pheatmap", "pcaExplorer", "RColorBrewer", "VennDiagram", "wesanderson", "ggvenn", "WGCNA") # Packages that your targets need for their tasks.
   # Pipelines that take a long time to run may benefit from
   # optional distributed computing. To use this capability
   # in tar_make(), supply a {crew} controller
@@ -26,6 +26,7 @@ tar_option_set(
 )
 
 # Run the R scripts in the R/ folder with your custom functions:
+tar_source("R/AnalyseDiff/00-Annotation.R")
 tar_source("R/AnalyseDiff/01-ReadMeta.R")
 tar_source("R/AnalyseDiff/02-BuildDESeq.R")
 tar_source("R/AnalyseDiff/03-DEanalysis.R")
@@ -40,13 +41,12 @@ tar_source("R/AnalyseDiff/11-MatchExtTraits.R")
 tar_source("R/AnalyseDiff/12-RetrieveHubGenes.R")
 
 
-# Replace the target list below with your own:
+
 list(
   ##################################################################################################
   ########################################## HgCO2 vs CT ###########################################
   ##################################################################################################
-  tar_target(FullAnnot, "results/Annotation/objects/FullAnnot", format = "file"),                  # Import & read Annotation file from the Annotation project
-  tar_target(AnnotationFile, readRDS(FullAnnot)),                                                  #
+  tar_target(AnnotationFile, BuildAnnot("configFiles/mpibr_sepoff_v1.emapper.annotations.xlsx", "configFiles/mpibr_sepoff_v1_annotations.tsv")), # Import & read Annotation file 
   ##################################################################################################
   ##################################################################################################
   tar_target(file, "configFiles/Design_Deseq1.tsv"),                                               # Script 1
@@ -54,17 +54,17 @@ list(
   tar_target(sampleTable1, tidyMeta2(meta)),                                                       #
   ##################################################################################################
   ##################################################################################################
-  tar_target(directory, "data/analyseDiff"),                                                       # Script 2
-  tar_target(star1, BuildDESeq(ST = sampleTable1, DIR = directory, DES=~Treatment)),               # Build the DESeq object from counts files
+  tar_target(directory, "data/analyseDiff/GenomeBased"),                                           # Script 2
+  tar_target(star1, BuildDESeq(ST = sampleTable1, DIR = directory, DES=~Treatment, relevel_treatment = TRUE, factor_treatment = TRUE)),               # Build the DESeq object from counts files
   ##################################################################################################
   ##################################################################################################
   tar_target(dds1, DEanalysis(star1, "Wald")),                                                     # Script3
   tar_target(DEG1, RetrieveDEG(dds1, "Treatment_Hg7.7_vs_CT8.1", 0.5)),                            # Running DE analysis and retrieving DEGs
-  tar_target(DEG1annot, AnnotDE(DEG1, AnnotationFile)),                                            #
+  tar_target(DEG1annot, AnnotDE(DEG1, AnnotationFile)),                                            # # 475 DEGs
   ##################################################################################################
   ##################################################################################################
-  tar_target(Heat1, HeatDEG(dds1, DEG1, AnnotationFile, 2, 2, rows = FALSE)),                      # Scripts 4 & 5
-  tar_target(ExportHeat1, PlotExport("results/Analysediff/figures/HgCO2_heatmap.png", Heat1)),     # Build & export heatmap of DEGs
+  tar_target(Heat1, HeatDEG(dds1, X=c("5","6","8","9","37","38","80","28","30","31","32","68"), DEG1, AnnotationFile, 2, 2, 7, rows = FALSE)),                      # Scripts 4 & 5
+  tar_target(ExportHeat1, PlotExport("results/Analysediff/figures/HgCO2_heatmap.png", Heat1, W=5, H=7, U="in")),     # Build & export heatmap of DEGs
   ##################################################################################################
   ##################################################################################################
   ##################################################################################################
@@ -78,189 +78,103 @@ list(
   ##################################################################################################
   tar_target(DEG2, RetrieveDEG(dds1, "Treatment_Hg8.1_vs_CT8.1", 0.5)),                            # Script3
   tar_target(DEG2annot, AnnotDE(DEG2, AnnotationFile)),                                            # Retrieving DEGs
+  ################################################################################################## 8 DEGs
   ##################################################################################################
-  ##################################################################################################
-  tar_target(Heat2, HeatDEG(dds1, DEG2, AnnotationFile, 2, 2)),                                    # Scripts 4 & 5
-  tar_target(ExportHeat2, PlotExport("results/Analysediff/figures/Hg_heatmap.png", Heat2)),        # Build & export heatmap of DEGs
+  tar_target(Heat2, HeatDEG(dds1, X=c("5","6","8","9","37","38","80","19","20","21","24","25","55","56"), DEG2, AnnotationFile, 2, 2, 7, rows=FALSE)),                                    # Scripts 4 & 5
+  tar_target(ExportHeat2, PlotExport("results/Analysediff/figures/Hg_heatmap.png", Heat2, W=5, H=3, U="in")),        # Build & export heatmap of DEGs
   ################################################################################################## Too few DEGs so don't need to go further on functional enrichement analysis.
   ########################################## CO2 vs CT #############################################
   ##################################################################################################
   tar_target(DEG3, RetrieveDEG(dds1, "Treatment_CT7.7_vs_CT8.1", 0.5)),                            # Script3
   tar_target(DEG3annot, AnnotDE(DEG3, AnnotationFile)),                                            # Retrieving DEGs
+  ################################################################################################## 30 DEGs
   ##################################################################################################
-  ##################################################################################################
-  tar_target(Heat3, HeatDEG(dds1, DEG3, AnnotationFile, 2, 2)),                                    # Scripts 4 & 5
-  tar_target(ExportHeat3, PlotExport("results/Analysediff/figures/CO2_heatmap.png", Heat3)),       # Build & export heatmap of DEGs
+  tar_target(Heat3, HeatDEG(dds1, X=c("5","6","8","9","37","38","80","10","11","12","13","46","48","85","86"), DEG3, AnnotationFile, 2, 2, 7, rows=FALSE)),                                    # Scripts 4 & 5
+  tar_target(ExportHeat3, PlotExport("results/Analysediff/figures/CO2_heatmap.png", Heat3, W=5, H=3, U="in")),       # Build & export heatmap of DEGs
   ################################################################################################## Too few DEGs so don't need to go further on functional enrichement analysis.
   ############################################# ALL ################################################
   tar_target(SumDEGplot, SumDEG(DEG1, DEG2, DEG3)),                                                #
+  tar_target(SumDEGExport, PlotExport("results/Analysediff/figures/SumDEG.png", SumDEGplot, W=5, H=5, U="in")),
   ##################################################################################################
   tar_target(VennData, BuildVennData(DEG1, DEG2, DEG3)),                                           #
-  tar_target(VennDiagram, displayVenn(VennData,                                                    #
-    category.names = c("HgCO2", "Hg", "CO2"),                                                      #
-    lwd = 2,                                                                                       #
-    lty = 4,                                                                                       # Script 07
-    fill = c("#81A88D", "#7294D4", "#E6A0C4"),                                                     # Comparing DEGs from the three contrasts
-    cex = 1.2,                                                                                     #
-    fontface = "italic",                                                                           #
-    cat.cex = 1.3,                                                                                 #
-    cat.fontface = "bold",                                                                         #
-    cat.default.pos = "outer",                                                                     #
-    cat.dist = c(0.03, 0.03, 0.03))),                                                              #
-  tar_target(ExportVenn, PlotExport("results/AnalyseDiff/figures/VennDEGS.png", VennDiagram)),     #
+  tar_target(VennDiagram, displayVenn(VennData)),                                                                    #
+  tar_target(ExportVenn, PlotExport("results/AnalyseDiff/figures/VennDEGS.png", VennDiagram, W=5, H=5, U="in")),     #
   ##################################################################################################
   ####################################################################################################################################################
-  tar_target(file2, "results/AnalyseDiff/files/HgCO2_BP_results_rep_table.txt"),                                                                     #
+  tar_target(file2, "results/AnalyseDiff/files/HgCO2_BP_best_results.txt"),                                                                         #
   tar_target(HgCO2_GOMWU_BP, loadGOMWU(file2)),                                                                                                      # Script 08
   tar_target(HgCO2_BP_Plot, PlotGOMWU(HgCO2_GOMWU_BP)),                                                                                              # Computing/Plotting GOMWU results
-  tar_target(ExportHgCO2_BP_Plot, PlotExport("results/AnalyseDiff/figures/HgCO2_BP.png", HgCO2_BP_Plot, W=8, H=5, U="in")),                          #
+  tar_target(ExportHgCO2_BP_Plot, PlotExport("results/AnalyseDiff/figures/HgCO2_BP.png", HgCO2_BP_Plot, W=7, H=6.5, U="in")),                      #
+  tar_target(file2a, "results/AnalyseDiff/files/HgCO2_BP_all_results.txt"),                                                                         #
+  tar_target(HgCO2_GOMWU_BP.all, loadGOMWU(file2a)),
+  tar_target(gene2go.DEG, gomwu2deg(DEG1, AnnotationFile, GOforMWU1,HgCO2_GOMWU_BP.all)),                                                                # find the DEGs involved in GOMWU signal (n=52).
+  #################################################################################################################################################### 
   ####################################################################################################################################################
-  ####################################################################################################################################################
-  ############################################ Hg CO2 Interaction ####################################################################################
-  tar_target(star2, BuildDESeq(ST = sampleTable1, DIR = directory, DES=~Mercury+pCO2+Mercury:pCO2, relevel_treatment=FALSE, factor_treatment=TRUE)), # Script 2
-  tar_target(dds2, DEanalysis(star2, TEST="LRT", reduced=~Mercury + pCO2)),                                                                          # Script3
-  tar_target(InteractingGenes, RetrieveINT(dds2, "MercuryHg.pCO28.1", 0.5)),                                                                         # Running DE analysis and retrieving DEGs -> Run resultsNames(tar_read(dds2)) to chose the contrast
-  tar_target(InteractingGenesannot, AnnotDE(InteractingGenes, AnnotationFile)),                                                                      #
-  tar_target(HeatINT, HeatDEG(dds2, InteractingGenes, AnnotationFile, 2, 3, rows = FALSE)),                                                          # Scripts 4 & 5
-  tar_target(ExportHeatINT, PlotExport("results/Analysediff/figures/Interaction_heatmap.png", HeatINT, W=10, H=7, U="in")),                          # Build & export heatmap of DEGs
-  ####################################################################################################################################################
-  tar_target(GOforMWU2, goMWU(dds2, "MercuryHg.pCO28.1", AnnotationFile)),                                                                           #
-  tar_target(GENEforMWU2, geneMWUINT(dds2, "MercuryHg.pCO28.1", GOforMWU2)),                                                                         # Script 6
-  tar_target(GOTable2, ExportGO(GOforMWU2, "R/AnalyseDiff/GOMWU/GeneIntToGO.tab")),                                                                  # Build & Export Go & Gene files to be used by GOMWU (external scripts, cf. https://github.com/z0on/GO_MWU)
-  tar_target(GENEtable2, ExporteGENE(GENEforMWU2, "R/AnalyseDiff/GOMWU/GeneIntToValue.csv")),                                                        #
+  
+  
+  
   ####################################################################################################################################################
   ############################################ WGCNA #################################################################################################
   ####################################################################################################################################################
-  tar_target(meta2, tidyMeta2(meta)),                                                                                                                #
-  tar_target(star, BuildDESeq(ST = meta2, DIR = directory)),                                                                                         #
-  tar_target(exp, StarToExp(star)),                                                                                                                  #
-  tar_target(ExprFilt, ExpFilt(exp)),                                                                                                                #
-  tar_target(check, checkSamples(ExprFilt)),                                                                                                         #
-  tar_target(sampleTree, findOut(ExprFilt)),                                                                                                         # Script 09
-  tar_target(PlotTree, plotTree("results/AnalyseDiff/figures/SampleTree.png", sampleTree, H = 93), format = "file"),                                 # Building coexpression network
-  tar_target(ExpFiltOut, rmOut(sampleTree, ExprFilt, H = 93)),                                                                                       #
-  tar_target(spt, softThres(ExpFiltOut)),                                                                                                            #
+  tar_target(meta2, tidyMeta(meta)),                                                                                                                #
+  tar_target(star, BuildDESeq(ST = meta2, DIR = directory, DES=~Treatment, relevel_treatment = FALSE)),                                                                        #
+  tar_target(exp, StarToExp(star1)),                                                                                                                 #
+  tar_target(ExprFilt, ExpFilt(exp)),                 # To keep top 5000 more variable genes                                                         #
+  tar_target(check, checkSamples(ExprFilt)),          # If TRUE -> Don't need to remove outliers.                                                                                               #
+  #tar_target(sampleTree, findOut(ExprFilt)),                                                                                                        # Script 09
+  #tar_target(PlotTree, plotTree("results/AnalyseDiff/figures/SampleTree.png", sampleTree, H = 64), format = "file"),                                # Building coexpression network
+  #tar_target(ExpFiltOut, rmOut(sampleTree, ExprFilt, H = 59)),                                                                                      #
+  tar_target(spt, softThres(ExprFilt)),                                                                                                              #
   tar_target(R2, plotR2("results/AnalyseDiff/figures/R2.png", spt), format = "file"),                                                                #
   tar_target(meanConnect, plotConnect("results/AnalyseDiff/figures/meanConnect.png", spt), format = "file"),                                         #
   # tar_target(Adj, Adjacency(ExpOut, 8)),                                                                                                           # Adj is the weighted gene co-expression networks and contains 23,106 nodes (genes).
-  tar_target(net, moduleConstruct(ExpFiltOut, 8)),                                                                                                   #
+  tar_target(net, moduleConstruct(ExprFilt, 7)),                                                                                                     #
   #################################################################################################################################################################
   #################################################################################################################################################################
   # tar_target(TOM.dissim,TOMdissim(Adj)),                                                                                                                        #
   # tar_target(geneTree, TreeGene(TOM.dissim)),                                                                                                                   #
   # tar_target(ME, BuildModules(geneTree, TOM.dissim)),                                                                                                           #
-  tar_target(ModuleColors, MEColors(net, ExpFiltOut)),                                                                                                            #
-  tar_target(ME.dissim, MEdissim(ExpFiltOut, ModuleColors)),                                                                                                      # Script 10
-  tar_target(merged, mergeModules(ExpFiltOut, ModuleColors)),                                                                                                     # Constructing Eigengene modules
+  tar_target(ModuleColors, MEColors(net, ExprFilt)),                                                                                                              #
+  tar_target(ME.dissim, MEdissim(ExprFilt, ModuleColors)),                                                                                                        # Script 10
+  tar_target(merged, mergeModules(ExprFilt, ModuleColors)),                                                                                                       # Constructing Eigengene modules
   tar_target(mergedMEs, retrieveMergedME(merged)),                                                                                                                #
   tar_target(mergeColors, retrieveMergedColors(obj = merged, ModuleColors)),                                                                                      #
   tar_target(DendroColors, plotDendroColors(net, ModuleColors, mergeColors, "results/AnalyseDiff/figures/dendroColors.png"), format = "file"),                    #
   #################################################################################################################################################################
   ########################################################################################################################################################################
   tar_target(file3, "data/analyseDiff/Other/ExternalTraits.csv"),                                                                                                        #
-  tar_target(ExtTraits, loadTraits(path = file3, SEP = ";", DEC = ",", Exp.Matrix = ExpFiltOut)),                                                                        # Script 11
-  tar_target(CorrelationMatrix, ModTraitCor(ExpFiltOut, mergedMEs, ExtTraits)),                                                                                          # Matching eigengene modules and traits
+  tar_target(ExtTraits, loadTraits(path = file3, SEP = ";", DEC = ",", Exp.Matrix = ExprFilt)),                                                                          # Script 11
+  tar_target(CorrelationMatrix, ModTraitCor(ExprFilt, mergedMEs, ExtTraits)),                                                                                            # Matching eigengene modules and traits
   tar_target(Matrix, plotcor(ExtTraits, mergedMEs, CorrelationMatrix, "results/AnalyseDiff/figures/Module-Traits-Correlation.png", 12, 10, "in", 300), format = "file"), #
   ########################################################################################################################################################################
   #######################################################################################################################################################################################################
-  tar_target(MMall, ModuleMembership(mergedMEs, ExpFiltOut)),                                                                                                                                           #
-  tar_target(HubGeneBlue, HubGenes(mergeColors, "blue", MMall, c("MMblue"), Variable = MMblue, Percent = 0.95, AnnotationFile)),                                                                        # Script 12
-  tar_target(HubGeneTan, HubGenes(mergeColors, "tan", MMall, c("MMtan"), Variable = MMtan, Percent = 0.95, AnnotationFile)),                                                                            # Retrieving Hub Genes for each module eigengene of interest
-  tar_target(HubGeneMidnightblue, HubGenes(mergeColors, "midnightblue", MMall, c("MMmidnightblue"), Variable = MMmidnightblue, Percent = 0.95, AnnotationFile)),                                        #
-  tar_target(HubGeneDarkgreen, HubGenes(mergeColors, "darkgreen", MMall, c("MMdarkgreen"), Variable = MMdarkgreen, Percent = 0.95, AnnotationFile)),                                                    #
-  tar_target(HubGeneCyan, HubGenes(mergeColors, "cyan", MMall, c("MMcyan"), Variable = MMcyan, Percent = 0.95, AnnotationFile)),                                                                        #
-  tar_target(HubGeneYellow, HubGenes(mergeColors, "yellow", MMall, c("MMyellow"), Variable = MMyellow, Percent = 0.95, AnnotationFile)),                                                                #
-  tar_target(HubGenePurple, HubGenes(mergeColors, "purple", MMall, c("MMpurple"), Variable = MMpurple, Percent = 0.95, AnnotationFile)),                                                                #
-  tar_target(HubGeneRed, HubGenes(mergeColors, "red", MMall, c("MMred"), Variable = MMred, Percent = 0.95, AnnotationFile)),                                                                            #
+  tar_target(MMall, ModuleMembership(mergedMEs, ExprFilt)),                                                                                                                                             #
+  tar_target(HubGeneGreenyellow, HubGenes(mergeColors, "greenyellow", MMall, c("MMgreenyellow"), Variable = MMgreenyellow, Percent = 0.90, AnnotationFile)),                                                                    # Script 12 - Retrieving Hub Genes for each module eigengene of interest
+  tar_target(HubGeneRoyalblue, HubGenes(mergeColors, "royalblue", MMall, c("MMroyalblue"), Variable = MMroyalblue, Percent = 0.95, AnnotationFile)),
   #######################################################################################################################################################################################################
   #######################################################################################################################################################################################################
-  tar_target(TOM_subBlue, TOMsub(mergeColors, ExpFiltOut, "blue", 8)),                                                                                                                                  #
-  tar_target(exportBlueCytoscape, ExportTOMtoCyto(TOM_subBlue, AnnotationFile, "blue",                                                                                                                  #
-    PATH1 = "results/analyseDiff/files/WGCNA/BlueCytoscapeEdges.txt",                                                                                                                                   # Export TOM for blue module
-    PATH2 = "results/analyseDiff/files/WGCNA/BlueCytoscapeNodes.txt", Colors = mergeColors, THRLD = 0.15), format = "rds"),                                                                             #
-  tar_target(BlueNodeAttr, NodAttr(mergeColors, AnnotationFile, MMall, "blue", Vars = c("Gene", "MMblue"), PATH = "results/analyseDiff/files/WGCNA/BlueNodeAttributes.txt"), format = "rds"),           #
+  tar_target(TOM_subGreenyellow, TOMsub(mergeColors, ExprFilt, "greenyellow", 5)),                   # 440 genes in brown module                                                                                                               #
+  tar_target(exportGreenyellowCytoscape, ExportTOMtoCyto(TOM_subGreenyellow, AnnotationFile, "greenyellow",                                                                                                                  #
+    PATH1 = "results/analyseDiff/files/WGCNA/GreenyellowCytoscapeEdges.txt",                                                                                                                                   # Export TOM for blue module
+    PATH2 = "results/analyseDiff/files/WGCNA/GreenyellowCytoscapeNodes.txt", Colors = mergeColors, THRLD = 0.15), format = "rds"),                                                                             #
+  tar_target(GreenyellowNodeAttr, NodAttr(mergeColors, AnnotationFile, MMall, "greenyellow", Vars = c("Gene", "MMgreenyellow"), PATH = "results/analyseDiff/files/WGCNA/GreenyellowNodeAttributes.txt"), format = "rds"),           #
+  tar_target(GreenyellowAnnot, AnnotModules(mergeColors, "greenyellow", AnnotationFile)),
+  #######################################################################################################################################################################################################
+  tar_target(TOM_subRoyalblue, TOMsub(mergeColors, ExprFilt, "royalblue", 5)),                   # 440 genes in brown module                                                                                                               #
+  tar_target(exportRoyalblueCytoscape, ExportTOMtoCyto(TOM_subRoyalblue, AnnotationFile, "royalblue",                                                                                                                  #
+                                                         PATH1 = "results/analyseDiff/files/WGCNA/RoyalblueCytoscapeEdges.txt",                                                                                                                                   # Export TOM for blue module
+                                                         PATH2 = "results/analyseDiff/files/WGCNA/RoyalblueCytoscapeNodes.txt", Colors = mergeColors, THRLD = 0.15), format = "rds"),                                                                             #
+  tar_target(RoyalblueNodeAttr, NodAttr(mergeColors, AnnotationFile, MMall, "royalblue", Vars = c("Gene", "MMroyalblue"), PATH = "results/analyseDiff/files/WGCNA/RoyalblueNodeAttributes.txt"), format = "rds"),           #
+  tar_target(RoyalblueAnnot, AnnotModules(mergeColors, "royalblue", AnnotationFile)),
   #############################################################################################################################################################################################################################
-  tar_target(TOM_subMidnightblue, TOMsub(mergeColors, ExpFiltOut, "midnightblue", 8)),                                                                                                                                        #
-  tar_target(exportMidnightblueCytoscape, ExportTOMtoCyto(TOM_subMidnightblue, AnnotationFile, "midnightblue",                                                                                                                #
-    PATH1 = "results/analyseDiff/files/WGCNA/MidnightblueCytoscapeEdges.txt",                                                                                                                                                 # Export TOM for midnightblue module
-    PATH2 = "results/analyseDiff/files/WGCNA/MidnightblueCytoscapeNodes.txt", Colors = mergeColors, THRLD = 0.1), format = "rds"),                                                                                            #
-  tar_target(MidnightblueNodeAttr, NodAttr(mergeColors, AnnotationFile, MMall, "midnightblue", Vars = c("Gene", "MMmidnightblue"), PATH = "results/analyseDiff/files/WGCNA/MidnightblueNodeAttributes.txt"), format = "rds"), #
   #############################################################################################################################################################################################################################
-  tar_target(TOM_subDarkgreen, TOMsub(mergeColors, ExpFiltOut, "darkgreen", 8)),                                                                                                                                              #
-  tar_target(exportDarkgreenCytoscape, ExportTOMtoCyto(TOM_subDarkgreen, AnnotationFile, "darkgreen",                                                                                                                         #
-    PATH1 = "results/analyseDiff/files/WGCNA/DarkgreenCytoscapeEdges.txt",                                                                                                                                                    # Export TOM for darkgreen module
-    PATH2 = "results/analyseDiff/files/WGCNA/DarkgreenCytoscapeNodes.txt", Colors = mergeColors, THRLD = 0.1), format = "rds"),                                                                                               #
-  tar_target(DarkgreenNodeAttr, NodAttr(mergeColors, AnnotationFile, MMall, "darkgreen", Vars = c("Gene", "MMdarkgreen"), PATH = "results/analyseDiff/files/WGCNA/DarkgreenNodeAttributes.txt"), format = "rds"),             #
-  #############################################################################################################################################################################################################################
-  tar_target(TOM_subCyan, TOMsub(mergeColors, ExpFiltOut, "cyan", 8)),                                                                                                                                                        #
-  tar_target(exportCyanCytoscape, ExportTOMtoCyto(TOM_subCyan, AnnotationFile, "cyan",                                                                                                                                        #
-    PATH1 = "results/analyseDiff/files/WGCNA/CyanCytoscapeEdges.txt",                                                                                                                                                         # Export TOM for cyan module
-    PATH2 = "results/analyseDiff/files/WGCNA/CyanCytoscapeNodes.txt", Colors = mergeColors, THRLD = 0.2), format = "rds"),                                                                                                    #
-  tar_target(CyanNodeAttr, NodAttr(mergeColors, AnnotationFile, MMall, "cyan", Vars = c("Gene", "MMcyan"), PATH = "results/analyseDiff/files/WGCNA/CyanNodeAttributes.txt"), format = "rds"),                                 #
-  #############################################################################################################################################################################################################################
-  tar_target(TOM_subYellow, TOMsub(mergeColors, ExpFiltOut, "yellow", 8)),                                                                                                                                                    #
-  tar_target(exportYellowCytoscape, ExportTOMtoCyto(TOM_subYellow, AnnotationFile, "yellow",                                                                                                                                  #
-    PATH1 = "results/analyseDiff/files/WGCNA/YellowCytoscapeEdges.txt",                                                                                                                                                       # Export TOM for yellow module
-    PATH2 = "results/analyseDiff/files/WGCNA/YellowCytoscapeNodes.txt", Colors = mergeColors, THRLD = 0.15), format = "rds"),                                                                                                 #
-  tar_target(YellowNodeAttr, NodAttr(mergeColors, AnnotationFile, MMall, "yellow", Vars = c("Gene", "MMyellow"), PATH = "results/analyseDiff/files/WGCNA/YellowNodeAttributes.txt"), format = "rds"),                         #
-  #############################################################################################################################################################################################################################
-  tar_target(TOM_subPurple, TOMsub(mergeColors, ExpFiltOut, "purple", 8)),                                                                                                                                                    #
-  tar_target(exportPurpleCytoscape, ExportTOMtoCyto(TOM_subPurple, AnnotationFile, "purple",                                                                                                                                  #
-    PATH1 = "results/analyseDiff/files/WGCNA/PurpleCytoscapeEdges.txt",                                                                                                                                                       # Export TOM for purple module
-    PATH2 = "results/analyseDiff/files/WGCNA/PurpleCytoscapeNodes.txt", Colors = mergeColors, THRLD = 0.15), format = "rds"),                                                                                                 #
-  tar_target(PurpleNodeAttr, NodAttr(mergeColors, AnnotationFile, MMall, "purple", Vars = c("Gene", "MMpurple"), PATH = "results/analyseDiff/files/WGCNA/PurpleNodeAttributes.txt"), format = "rds"),                         #
-  #############################################################################################################################################################################################################################
-  tar_target(TOM_subTan, TOMsub(mergeColors, ExpFiltOut, "tan", 8)),                                                                                                                                                          #
-  tar_target(exportTanCytoscape, ExportTOMtoCyto(TOM_subTan, AnnotationFile, "tan",                                                                                                                                           #
-    PATH1 = "results/analyseDiff/files/WGCNA/TanCytoscapeEdges.txt",                                                                                                                                                          # Export TOM for tan module
-    PATH2 = "results/analyseDiff/files/WGCNA/TanCytoscapeNodes.txt", Colors = mergeColors, THRLD = 0.15), format = "rds"),                                                                                                    #
-  tar_target(TanNodeAttr, NodAttr(mergeColors, AnnotationFile, MMall, "tan", Vars = c("Gene", "MMtan"), PATH = "results/analyseDiff/files/WGCNA/TanNodeAttributes.txt"), format = "rds"),                                     #
-  #############################################################################################################################################################################################################################
-  tar_target(TOM_subRed, TOMsub(mergeColors, ExpFiltOut, "red", 8)),                                                                                                                                                          #
-  tar_target(exportRedCytoscape, ExportTOMtoCyto(TOM_subRed, AnnotationFile, "red",                                                                                                                                           #
-    PATH1 = "results/analyseDiff/files/WGCNA/RedCytoscapeEdges.txt",                                                                                                                                                          # Export TOM for red module
-    PATH2 = "results/analyseDiff/files/WGCNA/RedCytoscapeNodes.txt", Colors = mergeColors, THRLD = 0.15), format = "rds"),                                                                                                    #
-  tar_target(RedNodeAttr, NodAttr(mergeColors, AnnotationFile, MMall, "red", Vars = c("Gene", "MMred"), PATH = "results/analyseDiff/files/WGCNA/RedNodeAttributes.txt"), format = "rds"),                                     #
-  #############################################################################################################################################################################################################################
-  tar_target(BlueForMWU, moduleMWU(MMall, TOM_subBlue, value = "MMblue")),                                                             #
-  tar_target(BlueGO, ModuleGO(AnnotationFile, BlueForMWU)),                                                                            # Export genes & GOs for GOMWU - Blue module
-  tar_target(BlueGOTable, ExportGO(BlueGO, "R/AnalyseDiff/GOMWU/BlueGeneToGO.tab")),                                                   #
-  tar_target(BlueGENEtable, ExporteGENE(BlueForMWU, "R/AnalyseDiff/GOMWU/BlueGeneToValue.csv")),                                       #
+  tar_target(moduleGO, ModuleGO(AnnotationFile, MMall)),                                                                               #
+  tar_target(moduleGOTable, ExportGO(moduleGO, "R/AnalyseDiff/GOMWU/moduleGeneToGO.tab")),                                             #
+  tar_target(GreenyellowForMWU, moduleMWU(MMall, TOM_subGreenyellow, value = "MMgreenyellow")),                                        # Export genes & GOs for GOMWU - Blue module   
+  tar_target(GreenyellowGENEtable, ExporteGENE(GreenyellowForMWU, "R/AnalyseDiff/GOMWU/GreenyellowGeneToValue.csv")),                  #
+  tar_target(RoyalblueForMWU, moduleMWU(MMall, TOM_subRoyalblue, value = "MMroyalblue")),                                        # Export genes & GOs for GOMWU - Blue module   
+  tar_target(RoyalblueGENEtable, ExporteGENE(RoyalblueForMWU, "R/AnalyseDiff/GOMWU/RoyalblueGeneToValue.csv")),                  #
   ######################################################################################################################################
-  tar_target(MidnightblueForMWU, moduleMWU(MMall, TOM_subMidnightblue, value = "MMmidnightblue")),                                     #
-  tar_target(MidnightblueGO, ModuleGO(AnnotationFile, MidnightblueForMWU)),                                                            # Export genes & GOs for GOMWU - Midnightblue
-  tar_target(MidnightblueGOTable, ExportGO(MidnightblueGO, "R/AnalyseDiff/GOMWU/MidnightblueGeneToGO.tab")),                           #
-  tar_target(MidnightblueGENEtable, ExporteGENE(MidnightblueForMWU, "R/AnalyseDiff/GOMWU/MidnightblueGeneToValue.csv")),               #
-  ######################################################################################################################################
-  tar_target(DarkgreenForMWU, moduleMWU(MMall, TOM_subDarkgreen, value = "MMdarkgreen")),                                              #
-  tar_target(DarkgreenGO, ModuleGO(AnnotationFile, DarkgreenForMWU)),                                                                  # Export genes & GOs for GOMWU - Darkgreen
-  tar_target(DarkgreenGOTable, ExportGO(DarkgreenGO, "R/AnalyseDiff/GOMWU/DarkgreenGeneToGO.tab")),                                    #
-  tar_target(DarkgreenGENEtable, ExporteGENE(DarkgreenForMWU, "R/AnalyseDiff/GOMWU/DarkgreenGeneToValue.csv")),                        #
-  ######################################################################################################################################
-  tar_target(CyanForMWU, moduleMWU(MMall, TOM_subCyan, value = "MMcyan")),                                                             #
-  tar_target(CyanGO, ModuleGO(AnnotationFile, CyanForMWU)),                                                                            # Export genes & GOs for GOMWU - Cyan
-  tar_target(CyanGOTable, ExportGO(CyanGO, "R/AnalyseDiff/GOMWU/CyanGeneToGO.tab")),                                                   #
-  tar_target(CyanGENEtable, ExporteGENE(CyanForMWU, "R/AnalyseDiff/GOMWU/CyanGeneToValue.csv")),                                       #
-  ######################################################################################################################################
-  tar_target(YellowForMWU, moduleMWU(MMall, TOM_subYellow, value = "MMyellow")),                                                       #
-  tar_target(YellowGO, ModuleGO(AnnotationFile, YellowForMWU)),                                                                        # Export genes & GOs for GOMWU - Yellow
-  tar_target(YellowGOTable, ExportGO(YellowGO, "R/AnalyseDiff/GOMWU/YellowGeneToGO.tab")),                                             #
-  tar_target(YellowGENEtable, ExporteGENE(YellowForMWU, "R/AnalyseDiff/GOMWU/YellowGeneToValue.csv")),                                 #
-  ######################################################################################################################################
-  tar_target(PurpleForMWU, moduleMWU(MMall, TOM_subPurple, value = "MMpurple")),                                                       #
-  tar_target(PurpleGO, ModuleGO(AnnotationFile, PurpleForMWU)),                                                                        # Export genes & GOs for GOMWU - Purple
-  tar_target(PurpleGOTable, ExportGO(PurpleGO, "R/AnalyseDiff/GOMWU/PurpleGeneToGO.tab")),                                             #
-  tar_target(PurpleGENEtable, ExporteGENE(PurpleForMWU, "R/AnalyseDiff/GOMWU/PurpleGeneToValue.csv")),                                 #
-  ######################################################################################################################################
-  tar_target(TanForMWU, moduleMWU(MMall, TOM_subTan, value = "MMtan")),                                                                #
-  tar_target(TanGO, ModuleGO(AnnotationFile, TanForMWU)),                                                                              # Export genes & GOs for GOMWU - Tan   
-  tar_target(TanGOTable, ExportGO(TanGO, "R/AnalyseDiff/GOMWU/TanGeneToGO.tab")),                                                      #
-  tar_target(TanGENEtable, ExporteGENE(TanForMWU, "R/AnalyseDiff/GOMWU/TanGeneToValue.csv")),                                          #
-  ######################################################################################################################################
-  tar_target(RedForMWU, moduleMWU(MMall, TOM_subRed, value = "MMred")),                                                                #
-  tar_target(RedGO, ModuleGO(AnnotationFile, RedForMWU)),                                                                              # Export genes & GOs for GOMWU - Red
-  tar_target(RedGOTable, ExportGO(RedGO, "R/AnalyseDiff/GOMWU/RedGeneToGO.tab")),                                                      #
-  tar_target(RedGENEtable, ExporteGENE(RedForMWU, "R/AnalyseDiff/GOMWU/RedGeneToValue.csv")),                                          #
   ######################################################################################################################################
   tar_target(file4, "results/AnalyseDiff/files/Blue_BP_results_table.txt"),                                                            #
   tar_target(Blue_GOMWU_BP, loadGOMWU(file4)),                                                                                         # Script 08
@@ -274,63 +188,6 @@ list(
   ######################################################################################################################################
   ######################################################################################################################################
   ######################################################################################################################################
-  ################## GENOME BASED ######################################################################################################
-  ######################################################################################################################################
-  ######################################################################################################################################
-  ##################################################################################################
-  ################## HgCO2 vs CT ###################################################################
-  tar_target(GBAnnotationFile, "configFiles/mpibr_sepoff_v1_annotations.tsv"),                     #
-  tar_target(GBemapperFile, "configFiles/mpibr_sepoff_v1.emapper.annotations.xlsx"),
-  tar_target(GBannot, ReadMeta(GBAnnotationFile)),
-  tar_target(GBmapper, ReadMapper(GBemapperFile)),
-  tar_target(GBAnnotationFull, BuildAnnotation(GBmapper, GBannot)),
-  tar_target(GBdirectory, "data/analyseDiff/GenomeBased"),                                         # Script 2
-  tar_target(GBstar1, BuildDESeq(ST = sampleTable1, DIR = GBdirectory, DES=~Treatment)),             # Build the DESeq object from counts files
-  ##################################################################################################
-  ##################################################################################################
-  tar_target(GBdds1, DEanalysis(GBstar1, "Wald")),                                                 # Script3
-  tar_target(GBDEG1, RetrieveDEG(GBdds1, "Treatment_Hg7.7_vs_CT8.1", 0.5)),                        # Running DE analysis and retrieving DEGs
-  tar_target(GBDEG1annot, GBAnnotDE(GBDEG1, GBannot)),                                             # # 269 DEGs
-  ##################################################################################################
-  ##################################################################################################
-  tar_target(GBHeat1, HeatDEG(GBdds1, X=c("5","6","8","9","37","38","39","80","28","30","31","32","68"), GBDEG1, GBannot, 2, 2, rows = FALSE)),                      # Scripts 4 & 5
-  tar_target(GBExportHeat1, PlotExport("results/Analysediff/figures/HgCO2_heatmap.GB.jpg", GBHeat1, W=6, H=7, U="in")),     # Build & export heatmap of DEGs
-  ##################################################################################################
-  ########################################## Hg vs CT ##############################################
-  ##################################################################################################
-  tar_target(GBDEG2, RetrieveDEG(GBdds1, "Treatment_Hg8.1_vs_CT8.1", 0.5)),                        # Script3
-  tar_target(GBDEG2annot, AnnotDE(GBDEG2, GBannot)),                                               # Retrieving DEGs
-  ##################################################################################################
-  ##################################################################################################
-  tar_target(GBHeat2, HeatDEG(GBdds1, X=c("5","6","8","9","37","38","39","80","19","20","21","24","25","55","56"), GBDEG2, GBannot, 2, 2, rows=TRUE)),                                     # Scripts 4 & 5
-  tar_target(GBExportHeat2, PlotExport("results/Analysediff/figures/Hg_heatmap.GB.jpg", GBHeat2, W=6, H=7, U="in")), # Build & export heatmap of DEGs
-  ################################################################################################## Too few DEGs so don't need to go further on functional enrichement analysis.
-  ########################################## CO2 vs CT #############################################
-  ##################################################################################################
-  tar_target(GBDEG3, RetrieveDEG(GBdds1, "Treatment_CT7.7_vs_CT8.1", 0.5)),                        # Script3
-  tar_target(GBDEG3annot, AnnotDE(GBDEG3, GBannot)),                                               # Retrieving DEGs
-  ##################################################################################################
-  ##################################################################################################
-  tar_target(GBHeat3, HeatDEG(GBdds1, X=c("5","6","8","9","37","38","39","80","10","11","12","13","46","48","85","86"), GBDEG3, GBannot, 2, 2, rows = TRUE)),                                     # Scripts 4 & 5
-  tar_target(GBExportHeat3, PlotExport("results/Analysediff/figures/CO2_heatmap.GB.jpg", GBHeat3, W=15, H=7, U="in")), # Build & export heatmap of DEGs
-  ################################################################################################## Too few DEGs so don't need to go further on functional enrichement analysis.
-  ############################################# ALL ################################################
-  tar_target(GBSumDEGplot, SumDEG(GBDEG1, GBDEG2, GBDEG3)),                                                #
-  ##################################################################################################
-  tar_target(GBVennData, BuildVennData(GBDEG1, GBDEG2, GBDEG3)),                                   #
-  tar_target(GBVennDiagram, displayVenn(GBVennData,                                                #
-                                      category.names = c("HgCO2", "Hg", "CO2"),                    #
-                                      lwd = 2,                                                     #
-                                      lty = 4,                                                     # Script 07
-                                      fill = c("#81A88D", "#7294D4", "#E6A0C4"),                   # Comparing DEGs from the three contrasts
-                                      cex = 1.2,                                                   #
-                                      fontface = "italic",                                         #
-                                      cat.cex = 1.3,                                               #
-                                      cat.fontface = "bold",                                       #
-                                      cat.default.pos = "outer",                                   #
-                                      cat.dist = c(0.03, 0.03, 0.03))),                            #
-  tar_target(GBExportVenn, PlotExport("results/AnalyseDiff/figures/VennDEGS.GB.jpg", GBVennDiagram, W=6, H=6, U="in")),     #
-  ##################################################################################################
   tar_render(Report, path = "Report/RNAsep2_DEanalysis_Report2.Rmd")
 )
 

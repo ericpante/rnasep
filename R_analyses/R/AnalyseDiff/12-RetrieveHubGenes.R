@@ -37,15 +37,35 @@ HubGenes <- function(Colors, Mod, MM, Module, Variable, Percent, Annot) {
     rownames_to_column(var = "Gene") %>%
     filter(Gene %in% Col$Gene) %>%
     filter({{ Variable }} >= quantile({{ Variable }}, Percent, na.rm = TRUE))
-
-  valid_mapping <- Annot[!is.na(Annot$ProteinCode) & Annot$ProteinCode != "-", ]
-  transcript_to_preferred <- setNames(valid_mapping$ProteinCode, valid_mapping$Transcript)
-
-  Hub$Gene <- ifelse(Hub$Gene %in% names(transcript_to_preferred),
-    transcript_to_preferred[Hub$Gene],
-    Hub$Gene
-  )
-  return(Hub)
+  
+  a <- Annot
+  A <- a %>%
+    select(gene, name, product, Description) %>%
+    group_by(gene) %>%
+    summarise(across(
+      .cols = everything(),
+      .fns = ~ {
+        vals <- unique(.x[.x != "-" & .x != "" & !is.na(.x)])  # retire NA, "-", vide
+        if (length(vals) == 0) "-" else paste(vals, collapse = "/")
+      }
+    )) %>%
+    filter(gene %in% Hub$Gene)
+  
+  #A. <- A %>%
+  #  filter(name != "<unknown>")
+  
+  X <- merge(Hub, A, by.x="Gene", by.y="gene", all.x=TRUE)
+  
+#  Hub$ID2 <- Hub$Gene
+  
+#  idx <- match(Hub$Gene, A.$gene)
+#  Hub$ID2 <- ifelse(is.na(idx), Hub$Gene, A.$name[idx])
+  
+#  Hub$Gene <- Hub$ID2
+  
+#  Hub$ID2 <- NULL
+  
+  return(X)
 }
 
 
@@ -93,13 +113,29 @@ ExportTOMtoCyto <- function(TOMSUB, Annot, Mod, PATH1, PATH2, Colors, THRLD) {
     rownames_to_column(var = "Gene") %>%
     dplyr::filter(. == Mod)
 
-  valid_mapping <- Annot[!is.na(Annot$ProteinCode) & Annot$ProteinCode != "-", ]
-  transcript_to_preferred <- setNames(valid_mapping$ProteinCode, valid_mapping$Transcript)
-
-  Col$Gene <- ifelse(Col$Gene %in% names(transcript_to_preferred),
-    transcript_to_preferred[Col$Gene],
-    Col$Gene
-  )
+  a <- Annot
+  A <- a %>%
+    select(gene, name, product, Description) %>%
+    group_by(gene) %>%
+    summarise(across(
+      .cols = everything(),
+      .fns = ~ {
+        vals <- unique(.x[.x != "-" & .x != "" & !is.na(.x)])  # retire NA, "-", vide
+        if (length(vals) == 0) "-" else paste(vals, collapse = "/")
+      }
+    )) %>%
+    filter(gene %in% Col$Gene)
+  
+  A. <- A %>%
+    filter(name != "<unknown>")
+  
+  Col$ID2 <- Col$Gene
+  
+  idx <- match(Col$Gene, A.$gene)
+  Col$ID2 <- ifelse(is.na(idx), Col$Gene, A.$name[idx])
+  
+  Col$Gene <- Col$ID2
+  Col$ID2 <- NULL
 
   selected_genes <- Col[, 1]
 
@@ -136,19 +172,63 @@ NodAttr <- function(Colors, Annot, GMM, Mod, Vars, PATH) {
 
   colnames(nodAttr) <- c("name", "kME", "Size")
 
-  valid_mapping <- Annot[!is.na(Annot$ProteinCode) & Annot$ProteinCode != "-", ]
-  transcript_to_preferred <- setNames(valid_mapping$ProteinCode, valid_mapping$Transcript)
-
-  nodAttr$name <- ifelse(nodAttr$name %in% names(transcript_to_preferred),
-    transcript_to_preferred[nodAttr$name],
-    nodAttr$name
-  )
+  a <- Annot
+  A <- a %>%
+    select(gene, name, product, Description) %>%
+    group_by(gene) %>%
+    summarise(across(
+      .cols = everything(),
+      .fns = ~ {
+        vals <- unique(.x[.x != "-" & .x != "" & !is.na(.x)])  # retire NA, "-", vide
+        if (length(vals) == 0) "-" else paste(vals, collapse = "/")
+      }
+    )) %>%
+    filter(gene %in% nodAttr$name)
+  
+  A. <- A %>%
+    filter(name != "<unknown>")
+  
+  nodAttr$ID2 <- nodAttr$name
+  
+  idx <- match(nodAttr$name, A.$gene)
+  nodAttr$ID2 <- ifelse(is.na(idx), nodAttr$name, A.$name[idx])
+  
+  nodAttr$name <- nodAttr$ID2
+  nodAttr$ID2 <- NULL
 
 
 
   write.table(nodAttr, PATH, sep = "\t", row.names = FALSE, quote = FALSE)
 }
 
+#Colors <- tar_read(mergeColors)
+#Mod <- "royalblue"
+#Annot <- tar_read(AnnotationFile)
+## Retrieve annotated list of modules' genes:
+AnnotModules <- function(Colors, Mod, Annot){
+  
+  Col <- Colors %>%
+    as.data.frame() %>%
+    tibble::rownames_to_column(var = "Gene") %>%
+    dplyr::filter(. == Mod) %>%
+    select(Gene)
+  
+  a <- Annot
+  A <- a %>%
+    select(gene, name, product, Description) %>%
+    group_by(gene) %>%
+    summarise(across(
+      .cols = everything(),
+      .fns = ~ {
+        vals <- unique(.x[.x != "-" & .x != "" & !is.na(.x)])  # retire NA, "-", vide
+        if (length(vals) == 0) "-" else paste(vals, collapse = "/")
+      }
+    )) %>%
+    filter(gene %in% Col$Gene)
+  
+  X <- merge(Col, A, by.x = "Gene", by.y = "gene", all.x = TRUE)
+  
+}
 
 
 ## Calculate Gene-Trait Significance

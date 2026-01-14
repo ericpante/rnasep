@@ -4,29 +4,36 @@
 
 ###################################################
 
-
+#dds <- tar_read(dds2)
+#X <- c("5","6","8","9","37","38","39","80","10","11","12","13","46","48","85","86","19","20","21","24","25","55","56","28","30","31","32","68")
+#DEG <- tar_read(pCO2.DEG)
+#ncutrow=2
+#ncutcol=2
+#rows=TRUE
 # Heatmap
-HeatDEG <- function(dds, X, DEG, Annot, ncutrow, ncutcol, rows = TRUE) {
+HeatDEG <- function(dds, X, DEG, Annot, ncutrow, ncutcol, ngap, rows = TRUE) {
+  
+  
   vsd <- vst(dds)
   a <- assay(vsd) %>%
     as.data.frame() %>%
-    select(X) %>%
+    select(all_of(X)) %>%
     tibble::rownames_to_column(var = "ID") %>%
     filter(ID %in% DEG$ID)
 
-  valid_mapping <- Annot[Annot$product != "Hypothetical protein", c(1,6)]
+#  valid_mapping <- Annot[Annot$product != "Hypothetical protein", c(1,6)]
   
-  VM <- valid_mapping %>%
-    dplyr::group_by(gene) %>%
-    summarise(product = paste(sort(unique(product)), collapse = "/"))
-  
-  T2P <- setNames(VM$product, VM$gene)
-  
-
-  a$ID <- ifelse(a$ID %in% names(T2P),
-    T2P[a$ID],
-    a$ID
-  )
+#  VM <- valid_mapping %>%
+#    dplyr::group_by(gene) %>%
+#    summarise(product = paste(sort(unique(product)), collapse = "/"))
+#  
+#  T2P <- setNames(VM$product, VM$gene)
+#
+#
+#  a$ID <- ifelse(a$ID %in% names(T2P),
+#    T2P[a$ID],
+#    a$ID
+#  )
 
   b <- a %>%
     dplyr::group_by(ID) %>%
@@ -39,9 +46,11 @@ HeatDEG <- function(dds, X, DEG, Annot, ncutrow, ncutcol, rows = TRUE) {
 
   Matrix <- b %>%
     select(-ID)
+  
 
   pheatmap::pheatmap((Matrix), # Modify parameters as convenience
-    cluster_cols = TRUE,
+    cluster_cols = FALSE,
+    gaps_col = ngap,
     clustering_distance_rows = "correlation",
     clustering_distance_cols = "euclidean",
     cluster_rows = TRUE,
@@ -53,14 +62,16 @@ HeatDEG <- function(dds, X, DEG, Annot, ncutrow, ncutcol, rows = TRUE) {
     cutree_cols = ncutcol,
     drop_levels = TRUE,
     legend = TRUE,
-    fontsize = 9,
+    fontsize = 12,
     cellwidth = 20,
-    angle_col = 45,
+    angle_col = 0,
     show_rownames = rows
   )
 }
 
-
+#A <- tar_read(DEG1)
+#B <- tar_read(DEG2)
+#C <- tar_read(DEG3)
 # Summarise number of DEG for each contrast
 
 SumDEG <- function(A, B, C) {
@@ -81,27 +92,112 @@ SumDEG <- function(A, B, C) {
   C$Condition <- "pCO2"
 
   dat <- rbind(A, B, C) %>%
-    mutate(nb = 1) %>%
-    select(Condition, Trend, nb) %>%
-    group_by(Condition, Trend) %>%
-    summarise(nobs = sum(nb))
+   dplyr:: mutate(nb = 1) %>%
+    dplyr::select(Condition, Trend, nb) %>%
+    dplyr::group_by(Condition, Trend) %>%
+    dplyr::summarise(nobs = sum(nb)) %>%
+    dplyr::mutate(N = ifelse(Trend == "Down-regulated", -nobs, nobs))
 
   dat %>%
-    ggplot(aes(x = Condition, y = nobs, fill = Trend)) +
-    geom_col(position = "dodge", color = "white") +
+    ggplot(aes(x = Condition, y = N, fill = Trend)) +
+    geom_col(color = "white") +
     theme_bw(base_size=14) +
+    scale_y_continuous(labels = abs) +
     scale_fill_manual(values = c("#046C9A", "#FD6467")) +
-    annotate("text", x = 0.8, y = 7, label = "4", color = "black", size = 6, fontface = "bold") +
-    annotate("text", x = 1.2, y = 7, label = "4", color = "black", size = 6, fontface = "bold") +
-    annotate("text", x = 1.8, y = 7, label = "4", color = "black", size = 6, fontface = "bold") +
-    annotate("text", x = 2.2, y = 7, label = "4", color = "black", size = 6, fontface = "bold") +
-    annotate("text", x = 2.8, y = 247, label = "244", color = "black", size = 6, fontface = "bold") +
-    annotate("text", x = 3.2, y = 46, label = "43", color = "black", size = 6, fontface = "bold") +
-    theme(axis.text.x = element_text(size=10),
-          axis.text.y = element_text(size=10),
-          axis.title.y = element_text(size=12)) +
+    annotate("text", x = 1, y = 30, label = "3", color = "black", size = 6, fontface = "bold") +
+    annotate("text", x = 1, y = -30, label = "5", color = "black", size = 6, fontface = "bold") +
+    annotate("text", x = 2, y = 30, label = "5", color = "black", size = 6, fontface = "bold") +
+    annotate("text", x = 2, y = -30, label = "25", color = "black", size = 6, fontface = "bold") +
+    annotate("text", x = 3, y = 30, label = "114", color = "black", size = 6, fontface = "bold") +
+    annotate("text", x = 3, y = -30, label = "361", color = "black", size = 6, fontface = "bold") +
+    theme(axis.text.x = element_text(size=12),
+          axis.text.y = element_text(size=12),
+          axis.title.y = element_text(size=14)) +
     labs(
       x = "",
       y = "Differentially expressed genes"
     )
+}
+
+### Interaction Plot:
+
+#dds <- tar_read(dds4)
+#NAME = "MercuryHg.pCO27.7"
+IntPlot <- function(dds, NAME){
+  
+  vsd <- vst(dds, blind = FALSE)
+  expr <- assay(vsd)
+  
+  res_lrt <- results(dds, name = NAME)
+  sig_int <- res_lrt[!is.na(res_lrt$padj) & res_lrt$padj < 0.05, ]
+  
+  genes <- rownames(sig_int)
+  
+    df <- expr[genes, ] %>%
+    as.data.frame() %>%
+    tibble::rownames_to_column("gene") %>%
+    tidyr::pivot_longer(-gene, names_to = "sample", values_to = "expression") %>%
+    left_join(
+      as.data.frame(colData(dds)) %>% tibble::rownames_to_column("sample"),
+      by = "sample" )
+    
+    profile_means <- df %>%
+      group_by(gene, Mercury, pCO2) %>%
+      summarise(mean_expr = mean(expression), .groups = "drop") %>%
+      tidyr::unite(condition, Mercury, pCO2) %>%
+      tidyr::pivot_wider(names_from = condition, values_from = mean_expr)
+    
+    profile_mat <- profile_means %>%
+      tibble::column_to_rownames("gene") %>%
+      scale(center = TRUE, scale = TRUE)
+    
+    dist_mat <- dist(profile_mat)
+    hc <- hclust(dist_mat, method = "ward.D2")
+    
+    plot(hc, labels = FALSE, hang = -1, main = "Dendrogramme des gènes à interaction")
+    rect.hclust(hc, k = 3, border = "red")
+    
+    k <- 3
+    clusters <- cutree(hc, k = k)
+    
+    res_df <- as.data.frame(sig_int) %>%
+      tibble::rownames_to_column("gene") %>%
+      mutate(cluster = clusters[gene])
+    
+    top_genes_by_cluster <- res_df %>%
+      filter(!is.na(cluster)) %>%
+      group_by(cluster) %>%
+      arrange(padj) %>%
+      slice_head(n = 1) %>%
+      pull(gene)
+    
+    genes_to_plot <- c("sepoff.g111096", "sepoff.g108796", "sepoff.g110782")
+    
+    df_plot <- expr[genes_to_plot, ] %>%
+      as.data.frame() %>%
+      tibble::rownames_to_column("gene") %>%
+      tidyr::pivot_longer(
+        -gene,
+        names_to = "sample",
+        values_to = "expression"
+      ) %>%
+      dplyr::left_join(
+        as.data.frame(colData(dds)) %>% tibble::rownames_to_column("sample"),
+        by = "sample"
+      )
+    
+    # Plot interaction
+    ggplot(df_plot, aes(x = Mercury, y = expression, color = pCO2, group = pCO2)) +
+      stat_summary(fun = mean, geom = "line", linewidth = 1, linetype = "dotted") +
+      stat_summary(fun = mean, geom = "point", size=5) +
+      facet_wrap(~gene, scales = "free_y", nrow=1) +  # 1 gène par cluster
+      theme_bw(base_size = 14) +
+      scale_color_manual(values = c("#46ACC8", "#E58601")) +
+      labs(
+        y = "Expression (VST)",
+        x = "Mercury treatment")
+    
+    
+    
+
 }

@@ -28,8 +28,8 @@ tar_source("R/Annotation/09-GOsummary.R")
 tar_source("R/Annotation/10-SumAnnotation.R")
 tar_source("R/Annotation/11-CompareAssembliesVenn.R")
 tar_source("R/Annotation/12-CompareSpecific.R")
-tar_source("R/Annotation/12-PrepMWU.R")
-tar_source("R/Annotation/12-MergePlot.R")
+tar_source("R/Annotation/13-MergePlot.R")
+tar_source("R/Annotation/14-PrepMWU.R")
 
 
 # Replace the target list below with your own:

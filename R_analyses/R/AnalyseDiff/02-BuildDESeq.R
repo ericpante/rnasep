@@ -12,13 +12,19 @@ BuildDESeq <- function(ST, DIR, DES, relevel_treatment=TRUE, factor_treatment=FA
     design = DES
   )
  
- if(relevel_treatment){
-   X$Treatment <- relevel(X$Treatment, ref="CT8.1")
+ X <- estimateSizeFactors(X)
+ X <- estimateDispersions(X)
  
-   }
+ idx <- rowSums(counts(X,normalized=TRUE) >= 10 ) >= 2  # check use normalize
+ X <- X[idx,]
  
  if(factor_treatment == TRUE){
-   X$pCO2 <- as.factor(X$pCO2)
+   X$Treatment <- as.factor(X$Treatment)
+ }
+ 
+ if(relevel_treatment == TRUE){
+   X$Treatment <- relevel(X$Treatment, ref="CT8.1")
+
  }
  
  return(X)
@@ -26,11 +32,11 @@ BuildDESeq <- function(ST, DIR, DES, relevel_treatment=TRUE, factor_treatment=FA
 
 StarToExp <- function(STAR) {
   star <- STAR
-  # star <- estimateSizeFactors(star)
-  # star <- estimateDispersions(star)
+   star <- estimateSizeFactors(star)
+   star <- estimateDispersions(star)
 
-  # idx <- rowSums(counts(star,normalized=TRUE) >= 10 ) >= 1
-  # star <- star[idx,]
+   idx <- rowSums(counts(star,normalized=TRUE) >= 10 ) >= 2
+   star <- star[idx,]
 
   vsd <- vst(star)
 

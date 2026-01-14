@@ -4,7 +4,9 @@
 
 ####################################
 
-
+#GO <- tar_read(AnnotationFile)
+#dds <- tar_read(dds1)
+#NAME="Treatment_Hg7.7_vs_CT8.1"
 # Gene to GO list
 
 goMWU <- function(dds, NAME, GO) {
@@ -13,11 +15,21 @@ goMWU <- function(dds, NAME, GO) {
     tibble::rownames_to_column(var = "ID") %>%
     dplyr::filter(pvalue != "NA")
 
-  GO %>%
-    data.frame() %>%
-    dplyr::filter(GOs != "NA" & GOs != "-" & Transcript %in% Res$ID) %>%
-    dplyr::select(Transcript, GOs) %>%
-    dplyr::mutate(GOs = stringr::str_replace_all(GOs, ",", ";"))
+GO %>%
+  data.frame() %>%
+  dplyr::filter(GOs != "NA" & GOs != "-" & gene %in% Res$ID) %>%
+  dplyr::select(gene, GOs) %>%
+  tidyr::separate_rows(GOs, sep=",") %>%
+  unique() %>%
+  #dplyr::mutate(GOs = stringr::str_replace_all(GOs, ",", ";")) %>%
+  dplyr::group_by(gene) %>%
+  dplyr::summarise(across(
+    .cols = everything(),
+    .fns = ~ {
+      vals <- unique(.x[.x != "-" & .x != "" & !is.na(.x)])  # retire NA, "-", vide
+      if (length(vals) == 0) "-" else paste(vals, collapse = ";")
+    }
+  ))
 }
 
 
@@ -30,27 +42,32 @@ geneMWU <- function(dds, NAME, THRESHOLD, Ref) {
     plyr::arrange(padj) %>%
     dplyr::filter(pvalue != "NA") %>%
     dplyr::select(ID, log2FoldChange) %>%
-    dplyr::filter(ID %in% Ref$Transcript)
+    dplyr::filter(ID %in% Ref$gene)
   
   return(Res)
 }
 
-
+#dds <- tar_read(dds4)
+#Ref <- tar_read(INT.GOforMWU)
+#NAME = "MercuryHg.pCO27.7"
 geneMWUINT <- function(dds, NAME, Ref) {
   Res <- results(dds, name = NAME) %>% # This objet contains all the genes influences by Treatment
     data.frame() %>%
     tibble::rownames_to_column(var = "ID") %>%
     plyr::arrange(padj) %>%
-    dplyr::filter(pvalue != "NA") %>%
-    dplyr::mutate(Sig = ifelse(pvalue < 0.05,
-                               1,
-                               0)) %>%
+    dplyr::filter(padj != "NA") %>%
+    dplyr::mutate(Sig = -log(padj)) %>%
+    #dplyr::mutate(Sig = ifelse(padj < 0.05,
+    #                           1,
+    #                           0)) %>%
     dplyr::select(ID, Sig) %>%
-    dplyr::filter(ID %in% Ref$Transcript)
+    dplyr::filter(ID %in% Ref$gene)
   
   return(Res)
 }
 
+
+#ALL <- tar_read(MMall)
 # Complete list of WGCNA analysed genes with value of belonging (1, 0)
 moduleMWU <- function(ALL, module, value) {
   Gene <- rownames(ALL) %>%
@@ -58,21 +75,39 @@ moduleMWU <- function(ALL, module, value) {
     dplyr::rename(ID = ".") %>%
     dplyr::mutate(Value = ifelse(ID %in% rownames(module),
       ALL[[value]],
-      0
-    ))
+      0))
 
   colnames(Gene) <- c("ID", "Value")
 
   return(Gene)
 }
 
+#GO <- tar_read(AnnotationFile)
+#ALL <- tar_read(MMall)
+
 # Module to GO list
-ModuleGO <- function(GO, GENES) {
+ModuleGO <- function(GO, ALL) {
+  
+  Gene <- rownames(ALL) %>%
+    as.data.frame() %>%
+    dplyr::rename(ID = ".")
+  
   GO %>%
     data.frame() %>%
-    dplyr::filter(GOs != "NA" & GOs != "-" & Transcript %in% GENES$ID) %>%
-    dplyr::select(Transcript, GOs) %>%
-    dplyr::mutate(GOs = str_replace_all(GOs, ",", ";"))
+    dplyr::filter(GOs != "NA" & GOs != "-" & gene %in% Gene$ID) %>%
+    dplyr::select(gene, GOs) %>%
+    tidyr::separate_rows(GOs, sep=",") %>%
+    unique() %>%
+    #dplyr::mutate(GOs = stringr::str_replace_all(GOs, ",", ";")) %>%
+    dplyr::group_by(gene) %>%
+    dplyr::summarise(across(
+      .cols = everything(),
+      .fns = ~ {
+        vals <- unique(.x[.x != "-" & .x != "" & !is.na(.x)])  # retire NA, "-", vide
+        if (length(vals) == 0) "-" else paste(vals, collapse = ";")
+      }
+    ))
+  
 }
 
 

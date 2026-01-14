@@ -32,7 +32,7 @@ RetrieveDEG <- function(dds, NAME, THRESHOLD) {
     rownames_to_column(var = "ID") %>%
     arrange(padj) %>%
     filter(padj < 0.05 &
-      abs(log2FoldChange) > 0.5) %>%
+      abs(log2FoldChange) > THRESHOLD) %>%
     select(ID, log2FoldChange)
 
 
@@ -55,33 +55,69 @@ RetrieveINT <- function(dds, NAME, THRESHOLD) {
 }
 
 
-AnnotDE <- function(DEG, Annot) {
-  valid_mapping <- Annot[!is.na(Annot$ProteinCode) & Annot$ProteinCode != "-", ]
-  transcript_to_preferred <- setNames(valid_mapping$ProteinCode, valid_mapping$Transcript)
+AnnotDE <- function(DEG, Annot, fromWald=TRUE) {
+  a <- Annot
+  b <- DEG
+  
+  A <- a %>%
+    select(gene, name, product, Description) %>%
+    group_by(gene) %>%
+    summarise(across(
+      .cols = everything(),
+      .fns = ~ {
+        vals <- unique(.x[.x != "-" & .x != "" & !is.na(.x)])  # retire NA, "-", vide
+        if (length(vals) == 0) "-" else paste(vals, collapse = "/")
+      }
+    )) %>%
+    filter(gene %in% b$ID)
+  
+  A. <- A %>%
+    filter(name != "<unknown>")
+  
+  b$ID2 <- b$ID
+  
+  idx <- match(b$ID, A.$gene)
+  b$ID2 <- ifelse(is.na(idx), b$ID, A.$name[idx])
+  
+  if(fromWald == TRUE){
+    B <- b %>%
+      dplyr::select(ID2, log2FoldChange) %>%
+      dplyr::rename(gene = ID2)
+  } else {
+    B <- b %>%
+    dplyr::select(ID2, padj) %>%
+    dplyr::rename(gene = ID2)
+  }
+  
+  
+  return(B)
+#  valid_mapping <- Annot[!is.na(Annot$ProteinCode) & Annot$ProteinCode != "-", ]
+#  transcript_to_preferred <- setNames(valid_mapping$ProteinCode, valid_mapping$Transcript)
 
-  Res <- DEG
-  Res$ID <- ifelse(Res$ID %in% names(transcript_to_preferred),
-    transcript_to_preferred[Res$ID],
-    Res$ID
-  )
+#  Res <- DEG
+#  Res$ID <- ifelse(Res$ID %in% names(transcript_to_preferred),
+#    transcript_to_preferred[Res$ID],
+#    Res$ID
+#  )
 
-  return(Res)
+#  return(Res)
 }
 
 GBAnnotDE <- function(DEG, Annot) {
-  valid_mapping <- Annot[Annot$product != "Hypothetical protein", c(1,6)]
   
-  VM <- valid_mapping %>%
-    dplyr::group_by(gene) %>%
-    summarise(product = paste(sort(unique(product)), collapse = "/"))
+#  valid_mapping <- Annot[Annot$product != "Hypothetical protein", c(1,6)]
   
-  T2P <- setNames(VM$product, VM$gene)
-  
-  Res <- DEG
-  Res$ID <- ifelse(Res$ID %in% names(T2P),
-                   T2P[Res$ID],
-                   Res$ID
-  )
+#  VM <- valid_mapping %>%
+#    dplyr::group_by(gene) %>%
+#    summarise(product = paste(sort(unique(product)), collapse = "/"))
+#  
+#  T2P <- setNames(VM$product, VM$gene)
+#  
+#  Res <- DEG
+#  Res$ID <- ifelse(Res$ID %in% names(T2P),
+#                   T2P[Res$ID],
+#                   Res$ID
+#  )
   
   return(Res)
   

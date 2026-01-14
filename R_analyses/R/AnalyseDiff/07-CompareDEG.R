@@ -16,6 +16,54 @@ BuildVennData <- function(A, B, C) {
 }
 
 # Displaying the VennDiagram
-displayVenn <- function(x, ...) {
-  venn.diagram(x, filename = NULL, ...)
+#displayVenn <- function(x, ...) {
+#  venn.diagram(x, filename = NULL, ...)
+#}
+#Data <- tar_read(VennData)
+displayVenn <- function(Data) {
+  
+  names(Data) <- c("Hg+pCO2", "Hg", "pCO2")
+  
+  
+  
+a <-  ggvenn::ggvenn(
+    Data,
+    columns = c("Hg+pCO2", "Hg", "pCO2"),
+    show_stats = "c",
+    fill_color = c("#46ACC8", "#E58601", "red"),
+    fill_alpha=0.6,
+    auto_scale = FALSE,
+    stroke_size = 0.3,
+    stroke_color = "white",
+    set_name_size = 12,
+    text_size = 10,
+    padding=0.2
+  )
+
+return(a)
+  
+}
+
+displayVenn.FULL <- function(Data) {
+  
+  names(Data) <- c("pCO2", "Hg", "Interaction")
+  
+  
+  
+  a <-  ggvenn::ggvenn(
+    Data,
+    columns = c("pCO2", "Hg", "Interaction"),
+    show_stats = "c",
+    fill_color = c("#46ACC8", "#E58601", "red"),
+    fill_alpha=0.6,
+    auto_scale = FALSE,
+    stroke_size = 0.3,
+    stroke_color = "white",
+    set_name_size = 12,
+    text_size = 10,
+    padding=0.2
+  )
+  
+  return(a)
+  
 }
