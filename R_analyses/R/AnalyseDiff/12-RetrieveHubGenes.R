@@ -7,6 +7,7 @@
 
 ## After having defined the significant modules for each trait based on the correlation matrix
 
+################################
 ## Calculate Module Membership
 ModuleMembership <- function(ModuleEigen, Exp.Matrix, cols, R) {
   modNames <- substring(names(ModuleEigen), 3) # extract module names
@@ -19,11 +20,9 @@ ModuleMembership <- function(ModuleEigen, Exp.Matrix, cols, R) {
 
   return(geneModuleMembership)
 
-  #  ggm = geneModuleMembership[, cols]
-  #  ggm[apply(ggm, 1, function(x) any(abs(x) >= R)),]
 }
 
-
+################################
 # Retrieve hub genes based on KME:
 HubGenes <- function(Colors, Mod, MM, Module, Variable, Percent, Annot) {
   Col <- Colors %>%
@@ -51,9 +50,6 @@ HubGenes <- function(Colors, Mod, MM, Module, Variable, Percent, Annot) {
     )) %>%
     filter(gene %in% Hub$Gene)
   
-  #A. <- A %>%
-  #  filter(name != "<unknown>")
-  
   X <- merge(Hub, A, by.x="Gene", by.y="gene", all.x=TRUE)
   
 #  Hub$ID2 <- Hub$Gene
@@ -68,24 +64,8 @@ HubGenes <- function(Colors, Mod, MM, Module, Variable, Percent, Annot) {
   return(X)
 }
 
-
+################################
 ## Create reduced adjacency and TOM matrices
-# TOMsub <- function(Colors, Mod, TOMDISSIM){
-
-# selected_genes <- HUB[,1] #Create vector of hubgenes
-
-#  Col <- Colors %>% # To retreive only genes belonging to the specific module
-#    tibble::rownames_to_column(var="Gene") %>%
-#    dplyr::filter(. == Mod)
-
-#  selected_genes <- Col[,1]
-
-#  TOM <- 1-TOMDISSIM # Similarity
-
-#  TOM[selected_genes, selected_genes]
-
-# }
-
 TOMsub <- function(Col, Matrix, Module, softPower) {
   # Retrieving genes names
   a <- Col
@@ -105,7 +85,7 @@ TOMsub <- function(Col, Matrix, Module, softPower) {
 
 
 
-
+################################
 ## Export reduced TOM toward Cytoscape
 ExportTOMtoCyto <- function(TOMSUB, Annot, Mod, PATH1, PATH2, Colors, THRLD) {
   Col <- Colors %>%
@@ -153,7 +133,8 @@ ExportTOMtoCyto <- function(TOMSUB, Annot, Mod, PATH1, PATH2, Colors, THRLD) {
   )
 }
 
-
+################################
+# Node attribute table for Cytoscape
 NodAttr <- function(Colors, Annot, GMM, Mod, Vars, PATH) {
   Col <- Colors %>%
     as.data.frame() %>%
@@ -201,6 +182,7 @@ NodAttr <- function(Colors, Annot, GMM, Mod, Vars, PATH) {
   write.table(nodAttr, PATH, sep = "\t", row.names = FALSE, quote = FALSE)
 }
 
+################################
 #Colors <- tar_read(mergeColors)
 #Mod <- "royalblue"
 #Annot <- tar_read(AnnotationFile)
@@ -230,7 +212,7 @@ AnnotModules <- function(Colors, Mod, Annot){
   
 }
 
-
+################################
 ## Calculate Gene-Trait Significance
 TraitSignificance <- function(TraitData, Exp.Matrix, R) {
   TraitVar <- as.data.frame(TraitData)

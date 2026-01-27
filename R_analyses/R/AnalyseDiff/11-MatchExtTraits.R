@@ -5,9 +5,8 @@
 #####################################################
 
 
-
-
-
+################################
+# Load external traits
 loadTraits <- function(path, SEP, DEC, Exp.Matrix) {
   a <- read.delim(path, sep = SEP, dec = DEC)
 
@@ -17,7 +16,7 @@ loadTraits <- function(path, SEP, DEC, Exp.Matrix) {
   b[, -1]
 }
 
-
+################################
 # Computing Module-Traits correlation
 ModTraitCor <- function(Exp.Matrix, MEmerged, Traits) {
   nGenes <- ncol(Exp.Matrix)
@@ -35,7 +34,7 @@ ModTraitCor <- function(Exp.Matrix, MEmerged, Traits) {
   return(textMatrix)
 }
 
-
+################################
 # Plotting the matrix
 plotcor <- function(Traits, MEmerged, textMatrix, path, WIDTH, HEIGHT, UNITS, RES) {
   module.trait.correlation <- cor(MEmerged, Traits, use = "p") # p for pearson correlation coefficient

@@ -4,7 +4,7 @@
 
 ###################################################
 
-
+################################
 # Loading GOMWU results file
 loadGOMWU <- function(file) {
   res <- read.delim(file, sep = "\t") %>%
@@ -15,7 +15,7 @@ loadGOMWU <- function(file) {
   return(res)
 }
 
-#data <- tar_read(HgCO2_GOMWU_BP)
+################################
 # Customized plot of GOMWU results
 PlotGOMWU <- function(data) {
   
@@ -43,6 +43,8 @@ PlotGOMWU <- function(data) {
     )
 }
 
+
+################################
 ## Retrieve list of DEG involved in the GOMWU signal
 #DEG <- tar_read(DEG1)
 #annot <- tar_read(AnnotationFile)
@@ -91,4 +93,3 @@ gomwu2deg <- function(DEG, annot, gene2go, GO){
     
   
 }
-

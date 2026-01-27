@@ -4,13 +4,8 @@
 
 ###################################################
 
-#dds <- tar_read(dds2)
-#X <- c("5","6","8","9","37","38","39","80","10","11","12","13","46","48","85","86","19","20","21","24","25","55","56","28","30","31","32","68")
-#DEG <- tar_read(pCO2.DEG)
-#ncutrow=2
-#ncutcol=2
-#rows=TRUE
-# Heatmap
+################################
+# Plotting heatmap of DEGs
 HeatDEG <- function(dds, X, DEG, Annot, ncutrow, ncutcol, ngap, rows = TRUE) {
   
   
@@ -21,26 +16,11 @@ HeatDEG <- function(dds, X, DEG, Annot, ncutrow, ncutcol, ngap, rows = TRUE) {
     tibble::rownames_to_column(var = "ID") %>%
     filter(ID %in% DEG$ID)
 
-#  valid_mapping <- Annot[Annot$product != "Hypothetical protein", c(1,6)]
-  
-#  VM <- valid_mapping %>%
-#    dplyr::group_by(gene) %>%
-#    summarise(product = paste(sort(unique(product)), collapse = "/"))
-#  
-#  T2P <- setNames(VM$product, VM$gene)
-#
-#
-#  a$ID <- ifelse(a$ID %in% names(T2P),
-#    T2P[a$ID],
-#    a$ID
-#  )
-
   b <- a %>%
     dplyr::group_by(ID) %>%
     dplyr::mutate(ID = paste0(ID, "_", dplyr::row_number())) %>%
     dplyr::ungroup() %>%
     as.data.frame()
-
 
   rownames(b) <- b$ID
 
@@ -69,11 +49,8 @@ HeatDEG <- function(dds, X, DEG, Annot, ncutrow, ncutcol, ngap, rows = TRUE) {
   )
 }
 
-#A <- tar_read(DEG1)
-#B <- tar_read(DEG2)
-#C <- tar_read(DEG3)
+################################
 # Summarise number of DEG for each contrast
-
 SumDEG <- function(A, B, C) {
   A <- A %>%
     as.data.frame()
@@ -119,10 +96,8 @@ SumDEG <- function(A, B, C) {
     )
 }
 
-### Interaction Plot:
-
-#dds <- tar_read(dds4)
-#NAME = "MercuryHg.pCO27.7"
+################################
+### Interaction Plot - finaly not used here
 IntPlot <- function(dds, NAME){
   
   vsd <- vst(dds, blind = FALSE)

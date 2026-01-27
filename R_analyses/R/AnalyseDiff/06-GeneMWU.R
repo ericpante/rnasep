@@ -4,11 +4,8 @@
 
 ####################################
 
-#GO <- tar_read(AnnotationFile)
-#dds <- tar_read(dds1)
-#NAME="Treatment_Hg7.7_vs_CT8.1"
+################################
 # Gene to GO list
-
 goMWU <- function(dds, NAME, GO) {
   Res <- results(dds, name = NAME) %>%
     data.frame() %>%
@@ -32,9 +29,8 @@ GO %>%
   ))
 }
 
-
+################################
 # Complete list of analyzed genes
-
 geneMWU <- function(dds, NAME, THRESHOLD, Ref) {
   Res <- results(dds, name = NAME) %>% # This objet contains all the genes influences by Treatment
     data.frame() %>%
@@ -47,26 +43,7 @@ geneMWU <- function(dds, NAME, THRESHOLD, Ref) {
   return(Res)
 }
 
-#dds <- tar_read(dds4)
-#Ref <- tar_read(INT.GOforMWU)
-#NAME = "MercuryHg.pCO27.7"
-geneMWUINT <- function(dds, NAME, Ref) {
-  Res <- results(dds, name = NAME) %>% # This objet contains all the genes influences by Treatment
-    data.frame() %>%
-    tibble::rownames_to_column(var = "ID") %>%
-    plyr::arrange(padj) %>%
-    dplyr::filter(padj != "NA") %>%
-    dplyr::mutate(Sig = -log(padj)) %>%
-    #dplyr::mutate(Sig = ifelse(padj < 0.05,
-    #                           1,
-    #                           0)) %>%
-    dplyr::select(ID, Sig) %>%
-    dplyr::filter(ID %in% Ref$gene)
-  
-  return(Res)
-}
-
-
+################################
 #ALL <- tar_read(MMall)
 # Complete list of WGCNA analysed genes with value of belonging (1, 0)
 moduleMWU <- function(ALL, module, value) {
@@ -82,9 +59,7 @@ moduleMWU <- function(ALL, module, value) {
   return(Gene)
 }
 
-#GO <- tar_read(AnnotationFile)
-#ALL <- tar_read(MMall)
-
+################################
 # Module to GO list
 ModuleGO <- function(GO, ALL) {
   
@@ -111,20 +86,20 @@ ModuleGO <- function(GO, ALL) {
 }
 
 
-
+################################
 # Export Go table
 ExportGO <- function(X, FILE) {
   write.table(X, file = FILE, sep = "\t", quote = FALSE, row.names = FALSE, col.names = TRUE)
 }
 
+################################
 # Export Gene table
 ExporteGENE <- function(X, FILE) {
   write.csv(X, file = FILE, sep = ",", quote = FALSE, row.names = FALSE)
 }
 
-
-
-# Gene to KOG class list
+################################
+# Gene to KOG class list - don't used
 KOG <- function(KO, CLASS) {
   class <- read.delim(CLASS) %>%
     as.data.frame()
@@ -143,8 +118,8 @@ KOG <- function(KO, CLASS) {
   return(kog)
 }
 
-
-# Running KOGMWU
+################################
+# Running KOGMWU - don't used.
 KOGMWU <- function(GeneToKOG, ModuleGeneToKOG) {
   kog.mwu(ModuleGeneToKOG, GeneToKOG)
 }

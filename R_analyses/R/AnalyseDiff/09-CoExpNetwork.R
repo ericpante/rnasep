@@ -4,9 +4,8 @@
 #
 ###########################################################
 
-
+################################
 # Check samples
-
 checkSamples <- function(Exp.Matrix) {
   gsg <- goodSamplesGenes(Exp.Matrix)
 
@@ -15,7 +14,7 @@ checkSamples <- function(Exp.Matrix) {
   return(check)
 }
 
-
+################################
 # Identify outliers
 findOut <- function(Exp.Matrix) {
   sampleTree <- hclust(dist(Exp.Matrix), method = "average")
@@ -36,14 +35,14 @@ plotTree <- function(path, SAMPLETREE, H) {
   path
 }
 
-
+################################
 # remove outliers
 rmOut <- function(SAMPLETREE, Exp.Matrix, H) {
   cut.sampleTree <- cutreeStatic(SAMPLETREE, cutHeight = H, minSize = 10)
   Exp.Matrix[cut.sampleTree == 1, ]
 }
 
-
+################################
 # Filtering more variable genes
 ExpFilt <- function(Matrix) {
   ExpMatrix <- as.matrix(Matrix)
@@ -54,11 +53,13 @@ ExpFilt <- function(Matrix) {
   ExpMatrix[, top_genes]
 }
 
+################################
 # Compute soft threshold
 softThres <- function(Exp.Matrix) {
   pickSoftThreshold(Exp.Matrix)
 }
 
+################################
 # Plot R^2 values as a function of the soft thresholds
 plotR2 <- function(path, SPT) {
   png(path)
@@ -73,7 +74,7 @@ plotR2 <- function(path, SPT) {
   path
 }
 
-
+################################
 # Plot mean connectivity as a function of soft thresholds
 plotConnect <- function(path, SPT) {
   png(path)
@@ -86,7 +87,7 @@ plotConnect <- function(path, SPT) {
   abline(h = 1, col = "red")
 }
 
-
+################################
 # Compute adjacency
 Adjacency <- function(Exp.Matrix, softPower) {
   adjacency(Exp.Matrix, power = softPower)

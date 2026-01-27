@@ -4,6 +4,7 @@
 
 ###################################################
 
+################################
 # Preforming differential expression analysis
 DEanalysis <- function(X, TEST, reduced = NULL) {
   
@@ -22,7 +23,7 @@ DEanalysis <- function(X, TEST, reduced = NULL) {
   
 }
 
-
+################################
 # Retrieving list of differentialy expressed genes
 RetrieveDEG <- function(dds, NAME, THRESHOLD) {
   Res <- results(dds, name = NAME)
@@ -39,7 +40,8 @@ RetrieveDEG <- function(dds, NAME, THRESHOLD) {
   return(Results)
 }
 
-# Retrieving list of interacting genes
+################################
+# Retrieving list of interacting genes - finaly not used in the project.
 RetrieveINT <- function(dds, NAME, THRESHOLD) {
   Res <- results(dds, name = NAME)
   
@@ -54,7 +56,8 @@ RetrieveINT <- function(dds, NAME, THRESHOLD) {
   return(Results)
 }
 
-
+################################
+# To add annotation to the differentialy expressed genes
 AnnotDE <- function(DEG, Annot, fromWald=TRUE) {
   a <- Annot
   b <- DEG
@@ -101,24 +104,4 @@ AnnotDE <- function(DEG, Annot, fromWald=TRUE) {
 #  )
 
 #  return(Res)
-}
-
-GBAnnotDE <- function(DEG, Annot) {
-  
-#  valid_mapping <- Annot[Annot$product != "Hypothetical protein", c(1,6)]
-  
-#  VM <- valid_mapping %>%
-#    dplyr::group_by(gene) %>%
-#    summarise(product = paste(sort(unique(product)), collapse = "/"))
-#  
-#  T2P <- setNames(VM$product, VM$gene)
-#  
-#  Res <- DEG
-#  Res$ID <- ifelse(Res$ID %in% names(T2P),
-#                   T2P[Res$ID],
-#                   Res$ID
-#  )
-  
-  return(Res)
-  
 }

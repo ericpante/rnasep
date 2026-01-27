@@ -4,15 +4,19 @@
 
 ###################################################
 
+################################
 # Function to read the metadata file
 ReadMeta <- function(file) {
   read.table(file, header = T, sep = "\t")
 }
 
+# To read the emapper file
 ReadMapper <- function(file) {
   read_excel(file)
 }
 
+################################
+# To build the annotation file. Obsolete, see script 00-Annotation.R instead.
 BuildAnnotation <- function(fileA, fileB) {
   
   GOfile <- fileA
@@ -46,8 +50,8 @@ BuildAnnotation <- function(fileA, fileB) {
   return(Annotation)
 }
 
-#meta <- tar_read(meta)
-# Function to tidy metadata file
+################################
+# Function to tidy metadata file - used for WGCNA
 tidyMeta <- function(meta) {
   Meta <- meta %>%
     filter(SampleName != "80") %>%
@@ -59,6 +63,8 @@ tidyMeta <- function(meta) {
   return(Meta)
 }
 
+################################
+# Function to tidy metadata file - used for DESeq2
 tidyMeta2 <- function(meta) {
   Meta <- meta %>%
     mutate(SampleName = paste(SampleName, "-", Treatment))

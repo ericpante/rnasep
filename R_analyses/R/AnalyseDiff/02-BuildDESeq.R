@@ -4,6 +4,7 @@
 
 ###################################################
 
+################################
 # Build the DESeq operational file:
 BuildDESeq <- function(ST, DIR, DES, relevel_treatment=TRUE, factor_treatment=FALSE) {
  X <- DESeqDataSetFromHTSeqCount(
@@ -30,6 +31,8 @@ BuildDESeq <- function(ST, DIR, DES, relevel_treatment=TRUE, factor_treatment=FA
  return(X)
 }
 
+################################
+# From deseq object to normalized counts matrix. Used for visualization.
 StarToExp <- function(STAR) {
   star <- STAR
    star <- estimateSizeFactors(star)

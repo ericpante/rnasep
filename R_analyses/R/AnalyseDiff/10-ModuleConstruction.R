@@ -4,7 +4,7 @@
 #
 ####################################################
 
-
+################################
 # Build dissimilarity matrix
 TOMdissim <- function(ADJACENCY) {
   TOM <- TOMsimilarity(ADJACENCY) # Similarity
@@ -16,15 +16,19 @@ TOMdissim <- function(ADJACENCY) {
   return(NegTOM)
 }
 
-# Module construction and merge
+################################
+# Clustering of genes
 TreeGene <- function(matrix) {
   geneTree <- hclust(as.dist(matrix), method = "average")
 }
 
+################################
+# Building modules
 BuildModules <- function(DENDRO, matrix) {
   cutreeDynamic(dendro = DENDRO, distM = matrix, deepSplit = 2, pamRespectsDendro = FALSE, minClusterSize = 30)
 }
 
+################################
 MEColors <- function(Modules, Matrix) {
   NET <- Modules
   lab <- labels2colors(NET$colors)
@@ -34,7 +38,7 @@ MEColors <- function(Modules, Matrix) {
   return(lab)
 }
 
-
+################################
 MEdissim <- function(Exp.Matrix, ModColors) {
   MElist <- moduleEigengenes(Exp.Matrix, colors = ModColors)
   ME.dissimilarity <- 1 - cor(MElist$eigengenes, use = "complete") # Calculate eigengene dissimilarity
@@ -42,17 +46,19 @@ MEdissim <- function(Exp.Matrix, ModColors) {
   return(ME.dissimilarity)
 }
 
+################################
 mergeModules <- function(Exp.Matrix, ModColors) {
   mergeCloseModules(Exp.Matrix, ModColors, cutHeight = .25)
 }
 
-
+################################
 retrieveMergedME <- function(obj) {
   a <- obj$newMEs
 
   return(a)
 }
 
+################################
 retrieveMergedColors <- function(obj, ModColors) {
   a <- obj$colors
 
@@ -61,7 +67,7 @@ retrieveMergedColors <- function(obj, ModColors) {
 }
 
 
-
+################################
 # Plot dendogram & modules
 plotDendroColors <- function(GENETREE, ModCol, MergeCol, path) {
   Tree <- GENETREE$dendrograms[[1]]
