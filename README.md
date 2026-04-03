@@ -1,16 +1,17 @@
-###################################################################################################
-												###
-# RNAsep PROJECTs  - PRJEB89715 (rnasep1) and PRJEB88225 (rnasep2)				###
-												###
-###################################################################################################
 
-Testing for transcriptomic effects of Hg and or Ag and pCO2 on Sepia officinalis newly hatched (whole body) and one month old (head tissues) juveniles.
+<!-- badges: start -->
+[![DOI biorxiv](https://img.shields.io/badge/BioRxiv-10.1101/2025.06.03.657592-blue.svg)](https://www.biorxiv.org/content/10.1101/2025.06.03.657592v4)
+[![DOI PCJ](https://img.shields.io/badge/PCJ-10.24072/pcjournal.703-blue.svg)]([https://www.seanoe.org](https://peercommunityjournal.org/articles/10.24072/pcjournal.703/))
+[![DOI SRA](https://img.shields.io/badge/SRA-PRJEB89715-orange.svg)](https://www.ncbi.nlm.nih.gov/sra/?term=PRJEB89715)
+[![DOI SRA](https://img.shields.io/badge/SRA-PRJEB88225-orange.svg)](https://www.ncbi.nlm.nih.gov/sra/?term=PRJEB88225)
+[![zenodo](https://img.shields.io/badge/zenodo-10.5281/zenodo.15462278-green.svg)]()
 
-This project is divided in two part : (i) *de novo* transcriptome assembly and annotation ; (ii) differential expression analysis.
+<!-- badges: stop -->
 
-Analyses were performed on both IBO-Core cluster and local machine (R langage).
+# RNAsep PROJECTs
 
-##########################################################################
+Testing for transcriptomic effects of Hg and or Ag and pCO2 on Sepia officinalis newly hatched (whole body) and one month old (head tissues) juveniles. This project is divided in two part : (i) *de novo* transcriptome assembly and annotation ; (ii) differential expression analysis. Analyses were performed on both IBF-Core cluster and local machine (R langage). rnasep1 project corresponds to PRJEB89715 and rnasep2 to PRJEB88225. 
+
 ## A great attention is paid to the workflow reproducibility.
 
 Therefore, all the bioinformatics tools are given above with the version used. The folders and scripts are numbered based on their execution order.
@@ -26,8 +27,7 @@ To easily reproduce this R project, one just need to:
 <img src="WorkflowFinal.png" width="600"/>
 
 
-#########################################################################
-## The project was made as Open Science.
+## The project was made Open Science.
 
 All the raw data and transcriptome assemblies are available at E.N.A under the accession numbers:
 
