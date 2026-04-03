@@ -8,9 +8,13 @@
 
 <!-- badges: stop -->
 
-# RNAsep PROJECTs
+# RNAsep projects
 
 Testing for transcriptomic effects of Hg and or Ag and pCO2 on Sepia officinalis newly hatched (whole body) and one month old (head tissues) juveniles. This project is divided in two part : (i) *de novo* transcriptome assembly and annotation ; (ii) differential expression analysis. Analyses were performed on both IBF-Core cluster and local machine (R langage). rnasep1 project corresponds to PRJEB89715 and rnasep2 to PRJEB88225. 
+
+## Publication
+
+Thomas, S. D.; Antoine, M.; Eric, P.; Thomas, L.-L. Two de novo transcriptome assemblies and functional annotations from juvenile cuttlefish (Sepia officinalis) under various metal and pCO2 exposure conditions. Peer Community Journal, Volume 6 (2026), article no. e28. https://doi.org/10.24072/pcjournal.703
 
 ## A great attention is paid to the workflow reproducibility.
 
