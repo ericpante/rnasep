@@ -36,7 +36,6 @@ All the raw data and transcriptome assemblies are available at E.N.A under the a
 
 The annotation files for rnasep1 and 2 are available at Zenodo under the DOI: 10.5281/zenodo.15462278
 
-#########################################################################
 ## Bioinformatic Tools and versions for data processing
 
 ### 1. Quality check:
