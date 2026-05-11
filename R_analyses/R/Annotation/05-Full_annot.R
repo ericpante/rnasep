@@ -38,7 +38,7 @@ SwissGO <- function(PATH1, PATH2) {
   return(GO.all)
 }
 
-# Merging blast & EggNog annotations
+# Merging blast, EggNog and SwilssGO annotations
 Full_annot <- function(Blast,Eggnog,GOswiss){
   
   a <- merge(Blast,Eggnog, by="Transcript", all=TRUE, no.dups=TRUE)

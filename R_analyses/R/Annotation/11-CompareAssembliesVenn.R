@@ -51,8 +51,8 @@ displayVenn <- function(fileA, fileB, fileC){
     fill_alpha=0.5,
     auto_scale = FALSE,
     stroke_size = 0.3,
-    set_name_size = 6,
-    text_size = 5,
+    set_name_size = 7,
+    text_size = 7,
     padding=0.6
   )
 }
@@ -93,8 +93,8 @@ displaySpecific <- function(fileA, fileB, fileC, exp="SEP1"){
     geom_col(just = 0.5) +
     theme_minimal() +
     theme(legend.position = "none",
-          axis.text = element_text(size = 11),
-          text = element_text(size=12),
+          axis.text = element_text(size = 14),
+          text = element_text(size=14),
           panel.grid = element_blank(),
           axis.line.x.bottom = element_line(),
           axis.line.y.left = element_line()) +

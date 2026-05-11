@@ -61,11 +61,11 @@ SumDEG <- function(A, B, C) {
   C <- C %>%
     as.data.frame()
 
-  A$Trend <- ifelse(A$log2FoldChange > 0, "Up-regulated", "Down-regulated")
+  A$Trend <- ifelse(A$log2FoldChange > 0, "Induced", "Repressed")
   A$Condition <- "pCO2+MeHg"
-  B$Trend <- ifelse(B$log2FoldChange > 0, "Up-regulated", "Down-regulated")
+  B$Trend <- ifelse(B$log2FoldChange > 0, "Induced", "Repressed")
   B$Condition <- "MeHg"
-  C$Trend <- ifelse(C$log2FoldChange > 0, "Up-regulated", "Down-regulated")
+  C$Trend <- ifelse(C$log2FoldChange > 0, "Induced", "Repressed")
   C$Condition <- "pCO2"
 
   dat <- rbind(A, B, C) %>%
@@ -73,20 +73,21 @@ SumDEG <- function(A, B, C) {
     dplyr::select(Condition, Trend, nb) %>%
     dplyr::group_by(Condition, Trend) %>%
     dplyr::summarise(nobs = sum(nb)) %>%
-    dplyr::mutate(N = ifelse(Trend == "Down-regulated", -nobs, nobs))
+    dplyr::mutate(N = ifelse(Trend == "Repressed", -nobs, nobs))
 
   dat %>%
     ggplot(aes(x = Condition, y = N, fill = Trend)) +
     geom_col(color = "white") +
     theme_bw(base_size=14) +
     scale_y_continuous(labels = abs) +
-    scale_fill_manual(values = c("#046C9A", "#FD6467")) +
-    annotate("text", x = 1, y = 30, label = "3", color = "black", size = 6, fontface = "bold") +
-    annotate("text", x = 1, y = -30, label = "5", color = "black", size = 6, fontface = "bold") +
-    annotate("text", x = 2, y = 30, label = "5", color = "black", size = 6, fontface = "bold") +
-    annotate("text", x = 2, y = -30, label = "25", color = "black", size = 6, fontface = "bold") +
-    annotate("text", x = 3, y = 30, label = "114", color = "black", size = 6, fontface = "bold") +
-    annotate("text", x = 3, y = -30, label = "361", color = "black", size = 6, fontface = "bold") +
+    scale_x_discrete(labels=c(expression(Hg[Low]), expression(CO[2]), expression(CO[2]+Hg[Low]))) +
+    scale_fill_manual(values = c("#FD6467", "#046C9A")) +
+    annotate("text", x = 1, y = 35, label = "3", color = "black", size = 6, fontface = "bold") +
+    annotate("text", x = 1, y = -35, label = "5", color = "black", size = 6, fontface = "bold") +
+    annotate("text", x = 2, y = 35, label = "5", color = "black", size = 6, fontface = "bold") +
+    annotate("text", x = 2, y = -35, label = "25", color = "black", size = 6, fontface = "bold") +
+    annotate("text", x = 3, y = 35, label = "114", color = "black", size = 6, fontface = "bold") +
+    annotate("text", x = 3, y = -35, label = "361", color = "black", size = 6, fontface = "bold") +
     theme(axis.text.x = element_text(size=12),
           axis.text.y = element_text(size=12),
           axis.title.y = element_text(size=14)) +

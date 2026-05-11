@@ -131,13 +131,14 @@ plotMacro <- function(file){
   x.top %>%
     ggplot(aes(Type, GO_name, size = Count, color = Macro_name.6)) +
     geom_point() +
-    theme(axis.text.x = element_text(size = 12),
-          axis.text.y = element_text(size=14)) +
     scale_color_manual(values=pal_extended) +
     theme_bw(base_size=14) +
+    theme(axis.text.x = element_blank(),
+          axis.text.y = element_text(size=15),
+          axis.title = element_blank()) +
     labs(
       x = "",
-      y = "Biological Process (lvl 6)",
+      y = "",
       color = "BP category (lvl 2)",
       size = "Nb of genes"
     )

@@ -119,9 +119,9 @@ list(
 ###############################################################################################
 ################################### SEP1 & SEP2 ###############################################
 ###############################################################################################
-  tar_target(MergeGOPlot, mergePlot(GOPlot.SEP1,GOPlot,NROW=1,LABELS=c("A", "B"))),           # Script 11
-  tar_target(MergeSumPlot, mergePlot(SumPlot.SEP1, SumPlot, NROW=2, LABELS=c("A", "B"))),     # Comparing ORF content from SEP1 & 2 assemblies
-  tar_target(MergeGOPlotExport, PlotExport("results/Annotation/figures/GOPlot.SEP1.SEP2.jpg", MergeGOPlot, W=10, H=7, U="in")),
+  tar_target(MergeGOPlot, mergePlot(GOPlot.SEP1,GOPlot)),           # Script 13
+  tar_target(MergeSumPlot, mergePlot1(SumPlot.SEP1, SumPlot, NROW=2, LABELS=c("A)", "B)"))),     # Comparing ORF content from SEP1 & 2 assemblies
+  tar_target(MergeGOPlotExport, PlotExport("results/Annotation/figures/GOPlot.SEP1.SEP2.jpg", MergeGOPlot, W=12, H=9, U="in")),
   tar_target(MergeSumPlotExport, PlotExport("results/Annotation/figures/Sum.SEP1.SEP2.jpg", MergeSumPlot)),
   tar_target(file12, "data/annotation/RBH_pairs.tsv"),                                        #
   tar_target(file13, "data/annotation/SEP1_all_ids_clean.txt"),                              #
@@ -169,7 +169,7 @@ list(
   tar_target(PlotMacroMap.SEP2, plotMacro(macroMap.SEP2)),
 ################################################################################################################################################################
   tar_target(ResumeComparison, cowPlot(Venn, SEP1.spec, SEP2.spec, PlotMacroMap.SEP1.spe, PlotMacroMap.SEP2.spe)),
-  tar_target(ExportResume, PlotExport("results/annotation/figures/ResumeComparison.jpg", ResumeComparison, W = 25, H = 12, U="in")),
+  tar_target(ExportResume, PlotExport("results/annotation/figures/resumeComparison.jpg", ResumeComparison, W = 28, H = 15, U="in", DPI=500)),
 ###################################################################################################################################################
 #######################################################################################
   tar_render(report, path='Report/RNAsep2_Annotation_Report.Rmd'),                    # Building a quick report

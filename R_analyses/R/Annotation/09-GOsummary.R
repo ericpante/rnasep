@@ -57,11 +57,11 @@ PlotGO <- function(data, NS1, NS2, NS3){
     facet_wrap(~Namespace, scales="free", ncol=1) +
     scale_fill_manual(values=wes_palette(n=3, name="Cavalcanti1")) +
     theme_bw() +
-    theme(axis.text.y=element_text(size=6),
+    theme(axis.text.y=element_text(size=10),
           legend.position = "none",
-          axis.title.x=element_text(size=9),
-          axis.title.y=element_text(size=9)) +
+          axis.title.x=element_blank(),
+          axis.title.y=element_text(size=7)) +
     coord_flip() +
-    labs(x="GO terms",
+    labs(x="",
          y="Occurrences (x100)")
 }

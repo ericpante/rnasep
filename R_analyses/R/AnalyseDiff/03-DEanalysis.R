@@ -28,7 +28,7 @@ DEanalysis <- function(X, TEST, reduced = NULL) {
 RetrieveDEG <- function(dds, NAME, THRESHOLD) {
   Res <- results(dds, name = NAME)
 
-  Results <- Res %>% # This objet contains every genes influences Treatment
+  Results <- Res %>% # This objet contains every genes influenced by  Treatment
     data.frame() %>%
     rownames_to_column(var = "ID") %>%
     arrange(padj) %>%

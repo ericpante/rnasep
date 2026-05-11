@@ -6,7 +6,7 @@
 
 ################################
 # Build the DESeq operational file:
-BuildDESeq <- function(ST, DIR, DES, relevel_treatment=TRUE, factor_treatment=FALSE) {
+BuildDESeq <- function(ST, DIR, DES, relevel_treatment=FALSE, factor_treatment=FALSE, relevel_cluster=FALSE, factor_cluster=FALSE ) {
  X <- DESeqDataSetFromHTSeqCount(
     sampleTable = ST,
     directory = DIR,
@@ -27,6 +27,14 @@ BuildDESeq <- function(ST, DIR, DES, relevel_treatment=TRUE, factor_treatment=FA
    X$Treatment <- relevel(X$Treatment, ref="CT8.1")
 
  }
+  
+  if(factor_cluster == TRUE) {
+    X$Cluster <- as.factor(X$Cluster)
+  }
+
+  if(relevel_cluster == TRUE) {
+    X$Cluster <- relevel(X$Cluster, ref="Cluster3")
+  }
  
  return(X)
 }

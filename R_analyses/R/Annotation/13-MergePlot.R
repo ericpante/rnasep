@@ -6,7 +6,22 @@
 
 # Merging plots
 mergePlot <- function(plot1,plot2,...,NROW, LABELS){
+  #plot_grid(plot1,plot2, nrow=NROW, labels=LABELS)
+  A <- plot1
+  B <- plot2
+  
+  ggdraw() +
+    draw_plot(A, x=0, y=0, width=0.56, height=1) +
+    draw_plot(B, x=0.56, y=0, width=0.44, height=1) +
+    draw_label(label="A)", x=0.04, y=0.95, size=20, fontface="bold") +
+    draw_label(label="B)", x=0.60, y=0.95, size=20, fontface="bold")
+  
+}
+
+# Merging plots
+mergePlot1 <- function(plot1,plot2,...,NROW, LABELS){
   plot_grid(plot1,plot2, nrow=NROW, labels=LABELS)
+  
 }
 
 # Merging plots
